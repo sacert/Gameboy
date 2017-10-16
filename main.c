@@ -1,5 +1,7 @@
 #include <stdio.h> // printing
+#include <stdlib.h>
 #include <math.h>
+#include "MMU.h"
 
 #define ROM_TITLE_OFFSET 0x134
 #define ROM_TYPE_OFFSET 0x147
@@ -23,6 +25,10 @@ int main(int argc, char* argv[]) {
     fseek(f, 0, SEEK_END); // get the end of the file
     len = ftell(f);
 
+    rom = malloc(len);
+    rewind(f);
+    fread(rom, len, 1, f);
+
     rewind(f);
     fread(header, 1, HEADER_SIZE, f);
 
@@ -41,5 +47,11 @@ int main(int argc, char* argv[]) {
     printf("Rom Type: %i\n", romType);
     printf("Rom Size: %i\n", romSize);
     printf("Ram Size: %i\n", ramSize);
+
+    unsigned short hmm = 0xC4C5;
+    printf("%u\n", (unsigned char)(hmm & 0xFF00));
+    printf("%x\n", hmm & 0x00FF);
+
+    fclose(f);
 
 }

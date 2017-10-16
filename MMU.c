@@ -1,14 +1,8 @@
-unsigned char rom[0x8000];   // ROM (Cart 1 & 2)
-unsigned char vram[0x2000];  // video RAM
-unsigned char sram[0x2000];  // switchable RAM
-unsigned char wram[0x2000];  // working RAM
-unsigned char oam[0xA0];     // Sprite Attribute Memory
-unsigned char io[0x100];     // Input/Output - Not sure if I need 0x100, 0x40 may suffice
-unsigned char hram[0x7F];    // High RAM
+#include "MMU.h"
 
 // 0xFFFF = Interrupt Enable Register
 
-void readByte(unsigned short address) {
+unsigned char readByte(unsigned short address) {
 
     if (0x0000 <= address && address <= 0x7FFF)
         return rom[address];
@@ -24,6 +18,12 @@ void readByte(unsigned short address) {
     		return io[address - 0xff00];
     else if (0xFF80 <= address && address <= 0xFFFE)
         return hram[address - 0xFF80];
+
+    return 0;
+}
+
+unsigned short readShort(unsigned short address) {
+    return (readByte(address) | (readByte(address+1) << 8));
 }
 
 void writeByte(unsigned short address, unsigned char value) {
@@ -41,4 +41,9 @@ void writeByte(unsigned short address, unsigned char value) {
     		io[address - 0xff00] = value;
     else if (0xFF80 <= address && address <= 0xFFFE)
         hram[address - 0xFF80] = value;
+}
+
+void writeShort(unsigned short address, unsigned short value) {
+    writeByte(address,(value & 0x00FF));
+    writeByte(address+1,(value & 0xFF00) >> 8);
 }
