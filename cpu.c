@@ -13,10 +13,10 @@
 #define SET_H(x) ((registers.F & 0xDF) | (x << 5))
 #define SET_C(x) ((registers.F & 0xEF) | (x << 4))
 
-#define FLAG_Z ((registers.F >> 7) & 0xF)
-#define FLAG_N ((registers.F >> 6) & 0xF)
-#define FLAG_H ((registers.F >> 5) & 0xF)
-#define FLAG_C ((registers.F >> 4) & 0xF)
+#define FLAG_Z ((registers.F >> 7) & 0x1)
+#define FLAG_N ((registers.F >> 6) & 0x1)
+#define FLAG_H ((registers.F >> 5) & 0x1)
+#define FLAG_C ((registers.F >> 4) & 0x1)
 
 struct registers {
     unsigned char A;
@@ -41,16 +41,46 @@ struct registers registers;
 
 void reset(void) {
 
-    registers.pc = 0x100;
+    registers.PC = 0x100;
     registers.cycles = 0;
 }
 
 void cpuCycle(void) {
-    unsigned char instruction = readByte(registers.pc++);
+    unsigned char instruction = readByte(registers.PC);
 
     switch (instruction) {
+        case 0x06:    // LD B,n
+            registers.B = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x0E:    // LD C,n
+            registers.C = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x16:    // LD D,n
+            registers.D = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x1E:    // LD E,n
+            registers.E = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x26:    // LD H,n
+            registers.H = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x2E:    // LD L,n
+            registers.L = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
         case 0x43:
-            registers.b = registers.e;
+            registers.B = registers.E;
             break;
         default:
             printf("Undefined instruction.");
