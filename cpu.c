@@ -49,9 +49,27 @@ void cpuCycle(void) {
     unsigned char instruction = readByte(registers.PC);
 
     switch (instruction) {
+        case 0x01:    // LD BC,nn
+            SET_BC(readShort(registers.PC+1));
+            registers.PC += 3;
+            registers.cycles += 3;
+        case 0x02:    // LD (BC),A
+            writeByte(GET_BC(), registers.A);
+            registers.PC += 1;
+            registers.cycles += 2;
         case 0x06:    // LD B,n
             registers.B = readByte(registers.PC+1);
             registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x08:    // LD (nn),SP
+            writeShort(readShort(registers.PC+1, registers.SP));
+            registers.PC += 3;
+            registers.cycles += 5;
+            break;
+        case 0x0A:    // LD A,(BC)
+            registers.A = readByte(GET_BC());
+            registers.PC += 1;
             registers.cycles += 2;
             break;
         case 0x0E:    // LD C,n
@@ -59,9 +77,22 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x11:    // LD DE,nn
+            SET_DE(readShort(registers.PC+1));
+            registers.PC += 3;
+            registers.cycles += 3;
+        case 0x12:    // LD (DE),A
+            writeByte(GET_DE(), registers.A);
+            registers.PC += 1;
+            registers.cycles += 2;
         case 0x16:    // LD D,n
             registers.D = readByte(registers.PC+1);
             registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x1A:    // LD A,(DE)
+            registers.A = readByte(GET_DE());
+            registers.PC += 1;
             registers.cycles += 2;
             break;
         case 0x1E:    // LD E,n
@@ -69,14 +100,46 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x21:    // LD HL,nn
+            SET_HL(readShort(registers.PC+1));
+            registers.PC += 3;
+            registers.cycles += 3;
+        case 0x22:    // LDI (HL), A
+            writeByte(GET_HL(),registers.A);
+            SET_HL(GET_HL()+1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x26:    // LD H,n
             registers.H = readByte(registers.PC+1);
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x2A:    // LDI A,(HL)
+            registers.A = readByte(GET_HL());
+            SET_HL(GET_HL()+1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x2E:    // LD L,n
             registers.L = readByte(registers.PC+1);
             registers.PC += 2;
+            registers.cycles += 2;
+            break;
+        case 0x31:    // LD SP,nn
+            registers.SP = readShort(registers.PC+1);
+            registers.PC += 3;
+            registers.cycles += 3;
+        case 0x32:    // LDD (HL), A
+            writeByte(GET_HL(),registers.A);
+            SET_HL(GET_HL() - 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x3A:    // LDD A, (HL)
+            registers.A = readByte(GET_HL());
+            SET_HL(GET_HL() - 1);
+            registers.PC += 1;
             registers.cycles += 2;
             break;
         case 0x40:    // LD B,B
@@ -114,6 +177,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x47:    // LD B,A
+            registers.B = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x48:    // LD C,B
             registers.C = registers.B;
             registers.PC += 1;
@@ -148,6 +216,11 @@ void cpuCycle(void) {
             registers.C = readByte(GET_HL());
             registers.PC += 1;
             registers.cycles += 2;
+            break;
+        case 0x4F:    // LD C, A
+            registers.C = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
             break;
         case 0x50:    // LD D,B
             registers.D = registers.B;
@@ -184,6 +257,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x57:    // LD D,A
+            registers.D = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x58:    // LD E,B
             registers.E = registers.B;
             registers.PC += 1;
@@ -219,6 +296,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x5F:    // LD E,A
+            registers.E = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x60:    // LD H,B
             registers.H = registers.B;
             registers.PC += 1;
@@ -254,6 +335,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x67:    // LD H,A
+            registers.H = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x68:    // LD L,B
             registers.L = registers.B;
             registers.PC += 1;
@@ -289,6 +374,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x6F:    // LD L,A
+            registers.L = registers.A;
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x70:    // LD (HL),B
             writeByte(GET_HL(), registers.B);
             registers.PC += 1;
@@ -324,6 +413,10 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 4;
             break;
+        case 0x77:    // LD (HL),A
+            writeByte(GET_HL(), registers.A);
+            registers.PC += 1;
+            registers.cycles += 2;
         case 0x78:    // LD A,B
             registers.A = registers.B;
             registers.PC += 1;
@@ -359,11 +452,53 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0xFA:    // LD A,(nn)
+            registers.A = readShort(registers.PC+1);
+            registers.PC += 3;
+            registers.cycles += 4;
+            break;
         case 0x7F:    // LD A,A
             registers.A = registers.A;
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0xE0:    // LD ($FF00+n), A
+            writeByte(0xFF00 + readByte(registers.PC), registers.A);
+            registers.PC += 2;
+            registers.cycles += 3;
+            break;
+        case 0xE2:    // LD A,($FF00+C)
+            writeByte(registers.C + 0xFF00, registers.A);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0xEA:    // LD A,n
+            writeByte(readShort(registers.PC+1), registers.A);
+            registers.PC += 3;
+            registers.cycles += 4;
+            break;
+        case 0xF0:    // LD A, ($FF00+n)
+            registers.A = readByte(registers.PC+ 0xFF00);
+            registers.PC += 2;
+            registers.cycles += 3;
+            break;
+        case 0xF2:    // LD A,($FF00+C)
+            registers.A = readByte(registers.C + 0xFF00);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0xF8:    // LD HL, SP + n
+            SET_HL(registers.SP + readByte(registers.PC+1));
+            set_N(0);
+      			set_Z(0);
+      			set_C(((registers.SP+i)&0xFF) < (registers.SP&0xFF)); // a carry will cause a wrap around = making new value smaller
+      			set_H(((registers.SP+i)&0x0F + registers.SP&0x0F) > 0x0F); // add the two, see if it becomes larger
+            registers.PC += 2;
+            registers.cycles += 3;
+        case 0xF9:    // LD SP,HL
+            registers.SP = GET_HL();
+            registers.PC += 1;
+            registers.cycles += 2;
         default:
             printf("Undefined instruction.");
             break;
