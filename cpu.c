@@ -462,6 +462,159 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0x80:    // ADD A,B
+            int i = registers.A + registers.B;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x81:    // ADD A,C
+            int i = registers.A + registers.C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x82:    // ADD A,D
+            int i = registers.A + registers.D;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x83:    // ADD A,E
+            int i = registers.A + registers.E;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x84:    // ADD A,H
+            int i = registers.A + registers.H;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x85:    // ADD A,L
+            int i = registers.A + registers.L;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+        case 0x86:    // ADD A,(HL)
+            int i = registers.A + readByte(GET_HL);
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 2;
+        case 0x87:    // ADD A,A
+            int i = registers.A + registers.A;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x88:    // ADC A,B
+            int i = registers.A + registers.B + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x89:    // ADC A,C
+            int i = registers.A + registers.C + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x8A:    // ADC A,D
+            int i = registers.A + registers.D + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x8B:    // ADC A,E
+            int i = registers.A + registers.E + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x8C:    // ADC A,H
+            int i = registers.A + registers.H + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x8D:    // ADC A,L
+            int i = registers.A + registers.L + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x8E:    // ADC A,(HL)
+            int i = registers.A + GET_HL() + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x8F:    // ADC A,A
+            int i = registers.A + registers.A + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0xC1:    // POP BC
             SET_BC(readShort(registers.SP) & 0xFFF0);
             registers.SP += 2;
@@ -472,6 +625,25 @@ void cpuCycle(void) {
             writeShort(registers.SP, GET_BC());
             registers.PC += 1;
             registers.cycles += 4;
+        case 0xC6:    // ADD A,n
+            int i = registers.A + readByte(registers.PC);
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 2;
+            registers.cycles += 2;
+        case 0xCE:    // ADC A,n
+            int i = registers.A + readByte(registers.PC) + FLAG_C;
+            SET_Z(!i);
+            SET_N(0);
+            SET_H((i & 0xF) < (registers.A & 0xF));
+            SET_C((i & 0xFF) < (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
         case 0xD1:    // POP DE
             SET_DE(readShort(registers.SP) & 0xFFF0);
             registers.SP += 2;
@@ -534,7 +706,7 @@ void cpuCycle(void) {
             set_N(0);
       			set_Z(0);
       			set_C(((registers.SP+i)&0xFF) < (registers.SP&0xFF)); // a carry will cause a wrap around = making new value smaller
-      			set_H(((registers.SP+i)&0x0F + registers.SP&0x0F) > 0x0F); // add the two, see if it becomes larger
+      			set_H(((registers.SP+i)&0x0F) < (registers.SP&0x0F)); // add the two, see if it becomes larger
             registers.PC += 2;
             registers.cycles += 3;
         case 0xF9:    // LD SP,HL
