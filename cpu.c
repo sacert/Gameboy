@@ -865,6 +865,78 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0xA8:    // XOR A,B
+            registers.A ^= registers.B;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xA9:    // XOR A,C
+            registers.A ^= registers.C;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAA:    // XOR A,D
+            registers.A ^= registers.D;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAB:    // XOR A,E
+            registers.A ^= registers.E;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAC:    // XOR A,H
+            registers.A ^= registers.H;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAD:    // XOR A,L
+            registers.A ^= registers.L;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAE:    // XOR A,(HL)
+            registers.A ^= readByte(GET_HL());
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xAF:    // XOR A,A
+            registers.A ^= registers.A;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0xB0:    // OR A,B
             registers.A |= registers.B;
             SET_Z(!registers.A);
@@ -1026,6 +1098,15 @@ void cpuCycle(void) {
             writeByte(readShort(registers.PC+1), registers.A);
             registers.PC += 3;
             registers.cycles += 4;
+            break;
+        case 0xEE:    // XOR A,n
+            registers.A ^= readByte(registers.PC);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.PC += 2;
+            registers.cycles += 2;
             break;
         case 0xF0:    // LD A, ($FF00+n)
             registers.A = readByte(registers.PC+ 0xFF00);
