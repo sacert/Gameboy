@@ -1009,6 +1009,70 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0xB8:    // CP B
+            SET_Z(registers.A == registers.B);
+            SET_N(1);
+            SET_H(((registers.A-registers.B) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.B);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xB9:    // CP C
+            SET_Z(registers.A == registers.C);
+            SET_N(1);
+            SET_H(((registers.A-registers.C) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.C);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xBA:    // CP D
+            SET_Z(registers.A == registers.D);
+            SET_N(1);
+            SET_H(((registers.A-registers.D) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.D);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xBB:    // CP E
+            SET_Z(registers.A == registers.E);
+            SET_N(1);
+            SET_H(((registers.A-registers.E) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.E);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xBC:    // CP H
+            SET_Z(registers.A == registers.H);
+            SET_N(1);
+            SET_H(((registers.A-registers.H) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.H);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xBD:    // CP L
+            SET_Z(registers.A == registers.L);
+            SET_N(1);
+            SET_H(((registers.A-registers.L) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.L);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0xBE:    // CP (HL)
+            SET_Z(registers.A == readByte(GET_HL()));
+            SET_N(1);
+            SET_H(((registers.A-readByte(GET_HL())) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < readByte(GET_HL()));
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0xBF:    // CP
+            SET_Z(registers.A == registers.A);
+            SET_N(1);
+            SET_H(((registers.A-registers.A) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < registers.A);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0xC1:    // POP BC
             SET_BC(readShort(registers.SP) & 0xFFF0);
             registers.SP += 2;
@@ -1151,6 +1215,14 @@ void cpuCycle(void) {
         case 0xF9:    // LD SP,HL
             registers.SP = GET_HL();
             registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0xFE:    // CP n
+            SET_Z(registers.A == readByte(registers.PC));
+            SET_N(1);
+            SET_H(((registers.A-readByte(registers.PC)) & 0xF) > (registers.A & 0xF));
+            SET_C(registers.A < readByte(registers.PC));
+            registers.PC += 2;
             registers.cycles += 2;
             break;
         default:
