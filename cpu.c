@@ -1320,6 +1320,14 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xE8:    // ADD SP,n
+            unsigned short s = registers.SP;
+            registers.SP += readByte(registers.PC);
+            SET_N(0);
+            SET_H((GET_HL() & 0xF) < (s & 0xF));
+            SET_C((GET_HL() & 0xFF) < (s & 0xFF));
+            registers.PC += 2;
+            registers.cycles += 4;
         case 0xEA:    // LD A,n
             writeByte(readShort(registers.PC+1), registers.A);
             registers.PC += 3;
