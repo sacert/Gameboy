@@ -103,6 +103,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x0B:    // DEC BC
+            SET_BC(GET_BC() - 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x0C:    // INC C
             registers.C += 1;
             SET_Z(!registers.C);
@@ -170,6 +175,11 @@ void cpuCycle(void) {
             registers.cycles += 2;
         case 0x1A:    // LD A,(DE)
             registers.A = readByte(GET_DE());
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x1B:    // DEC DE
+            SET_DE(GET_DE() - 1);
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -245,6 +255,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x2B:    // DEC HL
+            SET_HL(GET_HL() - 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x2C:    // INC L
             registers.L += 1;
             SET_Z(!registers.L);
@@ -311,6 +326,11 @@ void cpuCycle(void) {
         case 0x3A:    // LDD A, (HL)
             registers.A = readByte(GET_HL());
             SET_HL(GET_HL() - 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x3B:    // DEC SP
+            registers.SP -= 1;
             registers.PC += 1;
             registers.cycles += 2;
             break;
