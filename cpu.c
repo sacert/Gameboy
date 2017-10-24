@@ -59,6 +59,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x03:    // INC BC
+            SET_BC(GET_BC() + 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x04:    // INC B
             registers.B += 1;
             SET_Z(!registers.B);
@@ -129,6 +134,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x13:    // INC DE
+            SET_DE(GET_DE() + 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
         case 0x14:    // INC D
             registers.D += 1;
             SET_Z(!registers.D);
@@ -192,6 +202,11 @@ void cpuCycle(void) {
         case 0x22:    // LDI (HL), A
             writeByte(GET_HL(),registers.A);
             SET_HL(GET_HL()+1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x23:    // INC HL
+            SET_HL(GET_HL() + 1);
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -259,6 +274,11 @@ void cpuCycle(void) {
         case 0x32:    // LDD (HL), A
             writeByte(GET_HL(),registers.A);
             SET_HL(GET_HL() - 1);
+            registers.PC += 1;
+            registers.cycles += 2;
+            break;
+        case 0x33:    // INC SP
+            registers.SP += 1;
             registers.PC += 1;
             registers.cycles += 2;
             break;
