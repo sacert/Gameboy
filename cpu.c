@@ -287,6 +287,13 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0x2F:    // CPL
+            registers.A = ~registers.A;
+            SET_N(1);
+            SET_H(1);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x2D:    // DEC L
             registers.L -= 1;
             SET_Z(registers.L);
