@@ -246,6 +246,17 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x1F:    // RRA
+            unsigned char t = registers.A;
+            t = (t & 0x1);
+            registers.A = (registers.A >> 1) | (FLAG_C << 7);
+            SET_C(t);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x21:    // LD HL,nn
             SET_HL(readShort(registers.PC+1));
             registers.PC += 3;
