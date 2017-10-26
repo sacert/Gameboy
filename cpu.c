@@ -38,6 +38,7 @@ struct registers {
 } registers;
 
 struct registers registers;
+static int halt = 0; // varify if static is needed
 
 void reset(void) {
 
@@ -46,6 +47,12 @@ void reset(void) {
 }
 
 void cpuCycle(void) {
+
+    if (halt) {
+      registers.cycles += 1;
+      return;
+    }
+
     unsigned char instruction = readByte(registers.PC);
 
     switch (instruction) {
@@ -343,6 +350,11 @@ void cpuCycle(void) {
             SET_H((t & 0xF) > ((t-1) & 0xF));
             registers.PC += 1;
             registers.cycles += 2;
+            break;
+        case 0x36:    // LD (HL),n
+            writeByte(GET_HL(), readByte(registers.PC+1));
+            registers.PC += 2;
+            registers.cycles += 3;
             break;
         case 0x37:    // SCF
             SET_N(0);
@@ -663,10 +675,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
-        case 0x76:    // LD (HL),n
-            writeByte(GET_HL(), readByte(registers.PC+1));
-            registers.PC += 2;
-            registers.cycles += 4;
+        case 0x76:    // HALT
+            halt = 1;
+            registers.PC += 1;
+            registers.cycles += 1;
             break;
         case 0x77:    // LD (HL),A
             writeByte(GET_HL(), registers.A);
