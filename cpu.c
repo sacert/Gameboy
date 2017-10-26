@@ -1621,6 +1621,78 @@ void cbPrefix(inst) {
             SET_H(0);
             SET_C(s);
             break;
+        case 0x08:    // RRC B
+            unsigned char s = registers.B;
+            s = (s & 0x1);
+            registers.B = (registers.B >> 1) | (s << 7);
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x09:    // RRC C
+            unsigned char s = registers.C;
+            s = (s & 0x1);
+            registers.C = (registers.C >> 1) | (s << 7);
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0A:    // RRC D
+            unsigned char s = registers.D;
+            s = (s & 0x1);
+            registers.D = (registers.D >> 1) | (s << 7);
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0B:    // RRC E
+            unsigned char s = registers.E;
+            s = (s & 0x1);
+            registers.E = (registers.E >> 1) | (s << 7);
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0C:    // RRC H
+            unsigned char s = registers.H;
+            s = (s & 0x1);
+            registers.H = (registers.H >> 1) | (s << 7);
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0D:    // RRC L
+            unsigned char s = registers.L;
+            s = (s & 0x1);
+            registers.L = (registers.L >> 1) | (s << 7);
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0E:    // RRC (HL)
+            unsigned char s = readByte(GET_HL());
+            s = (s & 0x1);
+            SET_HL((GET_HL() >> 1) | (s << 7));
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x0F:    // RRC A
+            unsigned char s = registers.A;
+            s = (s & 0x1);
+            registers.A = (registers.A >> 1) | (s << 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
         case 0x10:    // RL B
             unsigned char t = registers.B;
             registers.B = (registers.B << 1) | FLAG_C;
