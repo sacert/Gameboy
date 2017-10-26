@@ -95,6 +95,17 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x07:    // RLCA
+            unsigned char s = registers.A;
+            s = (s >> 7);
+            registers.A = (registers.A << 1) | s;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x08:    // LD (nn),SP
             writeShort(readShort(registers.PC+1, registers.SP));
             registers.PC += 3;
