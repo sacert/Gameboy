@@ -2027,5 +2027,70 @@ void cbPrefix(inst) {
             SET_H((0);
             SET_C(0);
             break;
+        case 0x38:    // SRL B
+            unsigned char t = registers.B;
+            registers.B = (registers.B >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x39:    // SRL C
+            unsigned char t = registers.C;
+            registers.C = (registers.C >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x3A:    // SRL D
+            unsigned char t = registers.D;
+            registers.D = (registers.D >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x3B:    // SRL E
+            unsigned char t = registers.E;
+            registers.E = (registers.E >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x3C:    // SRL H
+            unsigned char t = registers.H;
+            registers.H = (registers.H >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x3D:    // SRL L
+            unsigned char t = registers.L;
+            registers.L = (registers.L >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x3E:    // SRL (HL)
+            unsigned char t = readByte(GET_HL());
+            SET_HL((GET_HL() >> 1));
+            SET_C(t >> 7);
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            registers.cycles += 2;
+            break;
+        case 0x3F:    // SRL A
+            unsigned char t = registers.A;
+            registers.A = (registers.A >> 1);
+            SET_C(t >> 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            break;
     }
 }
