@@ -1905,6 +1905,71 @@ void cbPrefix(inst) {
             SET_H(0);
             SET_C(s);
             break;
+        case 0x28:    // SRA B
+            unsigned char t = registers.B;
+            registers.B = (registers.B >> 1) | (registers.B & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x29:    // SRA C
+            unsigned char t = registers.C;
+            registers.C = (registers.C >> 1) | (registers.C & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x2A:    // SRA D
+            unsigned char t = registers.D;
+            registers.D = (registers.D >> 1) | (registers.D & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x2B:    // SRA E
+            unsigned char t = registers.E;
+            registers.E = (registers.E >> 1) | (registers.E & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x2C:    // SRA H
+            unsigned char t = registers.H;
+            registers.H = (registers.H >> 1) | (registers.H & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x2D:    // SRA L
+            unsigned char t = registers.L;
+            registers.L = (registers.L >> 1) | (registers.L & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x2E:    // SRA (HL)
+            unsigned char t = readByte(GET_HL());
+            SET_HL((GET_HL() >> 1) | (GET_HL() & 0x80)));
+            SET_C(t >> 7);
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            registers.cycles += 2;
+            break;
+        case 0x2F:    // SRA A
+            unsigned char t = registers.A;
+            registers.A = (registers.A >> 1) | (registers.A & 0x80);
+            SET_C(t >> 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            break;
         case 0x30:    // SWAP B
             registers.B = (((registers.B & 0x0F) << 4) | ((registers.B & 0xF0) >> 4));
             SET_Z(!registers.B);
