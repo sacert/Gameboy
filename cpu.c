@@ -186,6 +186,16 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x17:    // RLA
+            unsigned char t = registers.A;
+            registers.A = (registers.A << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x19:    // ADD HL,DE
             unsigned short s = GET_HL();
             SET_HL(s + GET_DE());
