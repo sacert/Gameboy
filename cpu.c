@@ -376,6 +376,13 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0x3F:    // CCF
+            SET_N(0);
+            SET_H(0);
+            SET_C(!FLAG_C);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x40:    // LD B,B
             registers.B = registers.B;
             registers.PC += 1;
