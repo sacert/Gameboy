@@ -1548,6 +1548,143 @@ void cbPrefix(inst) {
     unsigned char instruction = inst;
 
     switch (instruction) {
+        case 0x00:    // RLC B
+            unsigned char s = registers.B;
+            s = (s >> 7);
+            registers.B = (registers.B << 1) | s;
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x01:    // RLC C
+            unsigned char s = registers.C;
+            s = (s >> 7);
+            registers.C = (registers.C << 1) | s;
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x02:    // RLC D
+            unsigned char s = registers.D;
+            s = (s >> 7);
+            registers.D = (registers.D << 1) | s;
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x03:    // RLC E
+            unsigned char s = registers.E;
+            s = (s >> 7);
+            registers.E = (registers.E << 1) | s;
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x04:    // RLC H
+            unsigned char s = registers.H;
+            s = (s >> 7);
+            registers.H = (registers.H << 1) | s;
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x05:    // RLC L
+            unsigned char s = registers.L;
+            s = (s >> 7);
+            registers.L = (registers.L << 1) | s;
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x06:    // RLC HL
+            unsigned char s = readByte(GET_HL());
+            s = (s >> 7);
+            SET_HL((GET_HL() << 1) | s);
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            registers.cycles += 2;
+            break;
+        case 0x07:    // RLC A
+            unsigned char s = registers.A;
+            s = (s >> 7);
+            registers.A = (registers.A << 1) | s;
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x10:    // RL B
+            unsigned char t = registers.B;
+            registers.B = (registers.B << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x11:    // RL C
+            unsigned char t = registers.C;
+            registers.C = (registers.C << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x12:    // RL D
+            unsigned char t = registers.D;
+            registers.D = (registers.D << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x13:    // RL E
+            unsigned char t = registers.E;
+            registers.E = (registers.E << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x14:    // RL H
+            unsigned char t = registers.H;
+            registers.H = (registers.H << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x15:    // RL L
+            unsigned char t = registers.L;
+            registers.L = (registers.L << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x16:    // RL (HL)
+            unsigned char t = readByte(GET_HL());
+            SET_HL((GET_HL() << 1) | FLAG_C);
+            SET_C(t >> 7);
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            break;
+        case 0x17:    // RL A
+            unsigned char t = registers.A;
+            registers.A = (registers.A << 1) | FLAG_C;
+            SET_C(t >> 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            break;
         case 0x30:    // SWAP B
             registers.B = (((registers.B & 0x0F) << 4) | ((registers.B & 0xF0) >> 4));
             SET_Z(!registers.B);
