@@ -1683,6 +1683,7 @@ void cbPrefix(inst) {
             SET_N(0);
             SET_H(0);
             SET_C(s);
+            registers.cycles += 2;
             break;
         case 0x0F:    // RRC A
             unsigned char s = registers.A;
@@ -1748,6 +1749,7 @@ void cbPrefix(inst) {
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
+            registers.cycles += 2;
             break;
         case 0x17:    // RL A
             unsigned char t = registers.A;
@@ -1819,6 +1821,7 @@ void cbPrefix(inst) {
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
+            registers.cycles += 2;
             break;
         case 0x1F:    // RR A
             unsigned char t = registers.A;
@@ -1828,6 +1831,79 @@ void cbPrefix(inst) {
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
+            break;
+        case 0x20:    // SLA B
+            unsigned char s = registers.B;
+            s = (s >> 7);
+            registers.B = (registers.B << 1);
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x21:    // SLA C
+            unsigned char s = registers.C;
+            s = (s >> 7);
+            registers.C = (registers.C << 1);
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x22:    // SLA D
+            unsigned char s = registers.D;
+            s = (s >> 7);
+            registers.D = (registers.D << 1);
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x23:    // SLA E
+            unsigned char s = registers.E;
+            s = (s >> 7);
+            registers.E = (registers.E << 1);
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x24:    // SLA H
+            unsigned char s = registers.H;
+            s = (s >> 7);
+            registers.H = (registers.H << 1);
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x25:    // SLA L
+            unsigned char s = registers.L;
+            s = (s >> 7);
+            registers.L = (registers.L << 1);
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            break;
+        case 0x26:    // SLA HL
+            unsigned char s = readByte(GET_HL());
+            s = (s >> 7);
+            SET_HL((GET_HL() << 1));
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            registers.cycles += 2;
+            break;
+        case 0x27:    // SLA A
+            unsigned char s = registers.A;
+            s = (s >> 7);
+            registers.A = (registers.A << 1);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
             break;
         case 0x30:    // SWAP B
             registers.B = (((registers.B & 0x0F) << 4) | ((registers.B & 0xF0) >> 4));
