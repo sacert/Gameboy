@@ -241,6 +241,25 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x27:    // DAA
+            unsigned int s = registers.A;
+
+            if (FLAG_N) {
+              if(FLAG_H)
+                registers.A = (registers.A - 0x06)&0xFF;
+              if(FLAG_C)
+                registers.A -= 0x60;
+            } else {
+              if(flag_H || (registers.A & 0xF) > 9)
+                registers.A += 0x06;
+              if(flag_C || registers.A > 0x9F)
+                registers.A += 0x60;
+            }
+            SET_H(0);
+            SET_Z(!registers.A);
+            SET_C((registers.A & 0xFF) < (s & 0xFF));
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x29:    // ADD HL,HL
             unsigned short s = GET_HL();
             SET_HL(s + GET_HL());
