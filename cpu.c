@@ -1446,9 +1446,66 @@ void cpuCycle(void) {
     }
 }
 
-void cbPrefix(instruct) {
-    unsigned char instruction = instruct;
+void cbPrefix(inst) {
+    unsigned char instruction = inst;
 
     switch (instruction) {
+        case 0x30:    // SWAP B
+            registers.B = (((registers.B & 0x0F) << 4) | ((registers.B & 0xF0) >> 4));
+            SET_Z(!registers.B);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x31:    // SWAP C
+            registers.C = (((registers.C & 0x0F) << 4) | ((registers.C & 0xF0) >> 4));
+            SET_Z(!registers.C);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x32:    // SWAP D
+            registers.D = (((registers.D & 0x0F) << 4) | ((registers.D & 0xF0) >> 4));
+            SET_Z(!registers.D);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x33:    // SWAP E
+            registers.E = (((registers.E & 0x0F) << 4) | ((registers.E & 0xF0) >> 4));
+            SET_Z(!registers.E);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x34:    // SWAP H
+            registers.H = (((registers.H & 0x0F) << 4) | ((registers.H & 0xF0) >> 4));
+            SET_Z(!registers.H);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x35:    // SWAP L
+            registers.L = (((registers.L & 0x0F) << 4) | ((registers.L & 0xF0) >> 4));
+            SET_Z(!registers.L);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
+        case 0x36:    // SWAP HL
+            writeByte(GET_HL(), (((GET_HL() & 0x0F) << 4) | ((GET_HL() & 0xF0) >> 4)));
+            SET_Z(!GET_HL());
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            registers.cycles += 2;
+            break;
+        case 0x37:    // SWAP A
+            registers.A = (((registers.A & 0x0F) << 4) | ((registers.A & 0xF0) >> 4));
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H((0);
+            SET_C(0);
+            break;
     }
 }
