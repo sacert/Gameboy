@@ -341,6 +341,13 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0x37:    // SCF
+            SET_N(0);
+            SET_H(0);
+            SET_C(1);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x39:    // ADD HL,SP
             unsigned short s = GET_HL();
             SET_HL(s + registers.SP);
