@@ -1297,6 +1297,11 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xCB:    // Prefix
+            cbPrefix(register.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
         case 0xCE:    // ADC A,n
             int i = registers.A + readByte(registers.PC) + FLAG_C;
             SET_Z(!i);
@@ -1438,5 +1443,12 @@ void cpuCycle(void) {
         default:
             printf("Undefined instruction.");
             break;
+    }
+}
+
+void cbPrefix(instruct) {
+    unsigned char instruction = instruct;
+
+    switch (instruction) {
     }
 }
