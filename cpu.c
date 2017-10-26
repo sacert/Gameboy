@@ -150,6 +150,17 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x0F:    // RRCA
+            unsigned char s = registers.A;
+            s = (s & 0x1);
+            registers.A = (registers.A >> 1) | (s << 7);
+            SET_Z(!registers.A);
+            SET_N(0);
+            SET_H(0);
+            SET_C(s);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
         case 0x11:    // LD DE,nn
             SET_DE(readShort(registers.PC+1));
             registers.PC += 3;
