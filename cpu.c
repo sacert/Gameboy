@@ -49,6 +49,9 @@ void cpuCycle(void) {
     unsigned char instruction = readByte(registers.PC);
 
     switch (instruction) {
+        case 0x00:    // NOP
+            registers.PC += 1;
+            registers.cycles += 1;
         case 0x01:    // LD BC,nn
             SET_BC(readShort(registers.PC+1));
             registers.PC += 3;
