@@ -207,6 +207,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0x18:    // JP n
+            registers.PC += (signed char)readByte(registers.PC+1);
+            registers.cycles += 2;
+            break;
         case 0x19:    // ADD HL,DE
             unsigned short s = GET_HL();
             SET_HL(s + GET_DE());
@@ -256,6 +260,14 @@ void cpuCycle(void) {
             SET_H(0);
             registers.PC += 1;
             registers.cycles += 1;
+            break;
+        case 0x20:    // JP NZ
+            if (FLAG_Z == 0) {
+              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.cycles += 3;
+            } else {
+              registers.PC += 2;
+            }
             break;
         case 0x21:    // LD HL,nn
             SET_HL(readShort(registers.PC+1));
@@ -313,6 +325,14 @@ void cpuCycle(void) {
             SET_C((registers.A & 0xFF) < (s & 0xFF));
             registers.PC += 1;
             registers.cycles += 1;
+        case 0x28:    // JP Z
+            if (FLAG_Z == 1) {
+              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.cycles += 3;
+            } else {
+              registers.PC += 2;
+            }
+            break;
         case 0x29:    // ADD HL,HL
             unsigned short s = GET_HL();
             SET_HL(s + GET_HL());
@@ -360,6 +380,14 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0x30:    // JP NC
+            if (FLAG_C == 0) {
+              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.cycles += 3;
+            } else {
+              registers.PC += 2;
+            }
+            break;
         case 0x31:    // LD SP,nn
             registers.SP = readShort(registers.PC+1);
             registers.PC += 3;
@@ -405,6 +433,14 @@ void cpuCycle(void) {
             SET_C(1);
             registers.PC += 1;
             registers.cycles += 1;
+            break;
+        case 0x38:    // JP C
+            if (FLAG_C == 1) {
+              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.cycles += 3;
+            } else {
+              registers.PC += 2;
+            }
             break;
         case 0x39:    // ADD HL,SP
             unsigned short s = GET_HL();
@@ -1382,10 +1418,11 @@ void cpuCycle(void) {
         case 0xC2:    // JP NZ,nn
             if (FLAG_Z == 0) {
                 registers.PC = readShort(registers.PC+1);
+                registers.cyles += 3;
             } else {
                 registers.PC += 3;
+                registers.cyles += 2;
             }
-            registers.cyles += 3;
             break;
         case 0xC3:    // JP nn
             registers.PC = readShort(registers.PC+1);
@@ -1410,10 +1447,11 @@ void cpuCycle(void) {
         case 0xCA:    // JP Z,nn
             if (FLAG_Z == 1) {
                 registers.PC = readShort(registers.PC+1);
+                registers.cyles += 3;
             } else {
                 registers.PC += 3;
+                registers.cyles += 2;
             }
-            registers.cyles += 3;
             break;
         case 0xCB:    // Prefix
             cbPrefix(register.PC+1);
@@ -1439,10 +1477,11 @@ void cpuCycle(void) {
         case 0xD2:    // JP NC,nn
             if (FLAG_C == 0) {
                 registers.PC = readShort(registers.PC+1);
+                registers.cyles += 3;
             } else {
                 registers.PC += 3;
+                registers.cyles += 2;
             }
-            registers.cyles += 3;
             break;
         case 0xD5:    // PUSH DE
             registers.SP -= 2;
@@ -1463,10 +1502,11 @@ void cpuCycle(void) {
         case 0xDA:    // JP C,nn
             if (FLAG_C == 1) {
                 registers.PC = readShort(registers.PC+1);
+                registers.cyles += 3;
             } else {
                 registers.PC += 3;
+                registers.cyles += 2;
             }
-            registers.cyles += 3;
             break;
         case 0xE0:    // LD ($FF00+n), A
             writeByte(0xFF00 + readByte(registers.PC), registers.A);
@@ -1507,6 +1547,10 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFF) < (s & 0xFF));
             registers.PC += 2;
             registers.cycles += 4;
+        case 0xE9:    // JP (HL)
+            registers.PC = GET_HL();
+            registers.cycles += 1;
+            break;
         case 0xEA:    // LD A,n
             writeByte(readShort(registers.PC+1), registers.A);
             registers.PC += 3;
