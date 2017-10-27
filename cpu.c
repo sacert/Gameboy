@@ -1379,6 +1379,14 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 3;
             break;
+        case 0xC2:    // JP NZ,nn
+            if (FLAG_Z == 0) {
+                registers.PC = readShort(registers.PC+1);
+            } else {
+                registers.PC += 3;
+            }
+            registers.cyles += 3;
+            break;
         case 0xC3:    // JP nn
             registers.PC = readShort(registers.PC+1);
             registers.cycles += 3;
@@ -1398,6 +1406,14 @@ void cpuCycle(void) {
             registers.A = i;
             registers.PC += 2;
             registers.cycles += 2;
+            break;
+        case 0xCA:    // JP Z,nn
+            if (FLAG_Z == 1) {
+                registers.PC = readShort(registers.PC+1);
+            } else {
+                registers.PC += 3;
+            }
+            registers.cyles += 3;
             break;
         case 0xCB:    // Prefix
             cbPrefix(register.PC+1);
@@ -1420,6 +1436,14 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 3;
             break;
+        case 0xD2:    // JP NC,nn
+            if (FLAG_C == 0) {
+                registers.PC = readShort(registers.PC+1);
+            } else {
+                registers.PC += 3;
+            }
+            registers.cyles += 3;
+            break;
         case 0xD5:    // PUSH DE
             registers.SP -= 2;
             writeShort(registers.SP, GET_DE());
@@ -1435,6 +1459,14 @@ void cpuCycle(void) {
             registers.A = i;
             registers.PC += 2;
             registers.cycles += 2;
+            break;
+        case 0xDA:    // JP C,nn
+            if (FLAG_C == 1) {
+                registers.PC = readShort(registers.PC+1);
+            } else {
+                registers.PC += 3;
+            }
+            registers.cyles += 3;
             break;
         case 0xE0:    // LD ($FF00+n), A
             writeByte(0xFF00 + readByte(registers.PC), registers.A);
