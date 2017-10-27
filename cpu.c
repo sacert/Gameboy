@@ -2092,5 +2092,333 @@ void cbPrefix(inst) {
             SET_N(0);
             SET_H(0);
             break;
+        case 0x40:    // BIT B 0
+            SET_Z(!(registers.B & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x41:    // BIT C 0
+            SET_Z(!(registers.C & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x42:    // BIT D 0
+            SET_Z(!(registers.D & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x43:    // BIT E 0
+            SET_Z(!(registers.E & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x44:    // BIT H 0
+            SET_Z(!(registers.H & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x45:    // BIT L 0
+            SET_Z(!(registers.L & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x46:    // BIT (HL) 0
+            SET_Z(!(readByte(GET_HL()) & 0x01));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x47:    // BIT A 0
+            SET_Z(!(registers.A & 0x01));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x48:    // BIT B 1
+            SET_Z(!(registers.B & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x49:    // BIT C 1
+            SET_Z(!(registers.C & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x4A:    // BIT D 1
+            SET_Z(!(registers.D & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x4B:    // BIT E 1
+            SET_Z(!(registers.E & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x4C:    // BIT H 1
+            SET_Z(!(registers.H & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x4D:    // BIT L 1
+            SET_Z(!(registers.L & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x4E:    // BIT (HL) 1
+            SET_Z(!(readByte(GET_HL()) & 0x02));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x4F:    // BIT A 1
+            SET_Z(!(registers.A & 0x02));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x50:    // BIT B 2
+            SET_Z(!(registers.B & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x51:    // BIT C 2
+            SET_Z(!(registers.C & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x52:    // BIT D 2
+            SET_Z(!(registers.D & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x53:    // BIT E 2
+            SET_Z(!(registers.E & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x54:    // BIT H 2
+            SET_Z(!(registers.H & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x55:    // BIT L 2
+            SET_Z(!(registers.L & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x56:    // BIT (HL) 2
+            SET_Z(!(readByte(GET_HL()) & 0x04));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x57:    // BIT A 2
+            SET_Z(!(registers.A & 0x04));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x58:    // BIT B 3
+            SET_Z(!(registers.B & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x59:    // BIT C 3
+            SET_Z(!(registers.C & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x5A:    // BIT D 3
+            SET_Z(!(registers.D & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x5B:    // BIT E 3
+            SET_Z(!(registers.E & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x5C:    // BIT H 3
+            SET_Z(!(registers.H & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x5D:    // BIT L 3
+            SET_Z(!(registers.L & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x5E:    // BIT (HL) 3
+            SET_Z(!(readByte(GET_HL()) & 0x08));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x5F:    // BIT A 3
+            SET_Z(!(registers.A & 0x08));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x60:    // BIT B 4
+            SET_Z(!(registers.B & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x61:    // BIT C 4
+            SET_Z(!(registers.C & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x62:    // BIT D 4
+            SET_Z(!(registers.D & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x63:    // BIT E 4
+            SET_Z(!(registers.E & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x64:    // BIT H 4
+            SET_Z(!(registers.H & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x65:    // BIT L 4
+            SET_Z(!(registers.L & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x66:    // BIT (HL) 4
+            SET_Z(!(readByte(GET_HL()) & 0x10));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x67:    // BIT A 4
+            SET_Z(!(registers.A & 0x10));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x68:    // BIT B 5
+            SET_Z(!(registers.B & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x69:    // BIT C 5
+            SET_Z(!(registers.C & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x6A:    // BIT D 5
+            SET_Z(!(registers.D & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x6B:    // BIT E 5
+            SET_Z(!(registers.E & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x6C:    // BIT H 5
+            SET_Z(!(registers.H & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x6D:    // BIT L 5
+            SET_Z(!(registers.L & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x6E:    // BIT (HL) 5
+            SET_Z(!(readByte(GET_HL()) & 0x20));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x6F:    // BIT A 5
+            SET_Z(!(registers.A & 0x20));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x70:    // BIT B 6
+            SET_Z(!(registers.B & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x71:    // BIT C 6
+            SET_Z(!(registers.C & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x72:    // BIT D 6
+            SET_Z(!(registers.D & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x73:    // BIT E 6
+            SET_Z(!(registers.E & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x74:    // BIT H 6
+            SET_Z(!(registers.H & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x75:    // BIT L 6
+            SET_Z(!(registers.L & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x76:    // BIT (HL) 6
+            SET_Z(!(readByte(GET_HL()) & 0x40));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x77:    // BIT A 6
+            SET_Z(!(registers.A & 0x40));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x78:    // BIT B 7
+            SET_Z(!(registers.B & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x79:    // BIT C 7
+            SET_Z(!(registers.C & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x7A:    // BIT D 7
+            SET_Z(!(registers.D & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x7B:    // BIT E 7
+            SET_Z(!(registers.E & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x7C:    // BIT H 7
+            SET_Z(!(registers.H & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x7D:    // BIT L 7
+            SET_Z(!(registers.L & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
+        case 0x7E:    // BIT (HL) 7
+            SET_Z(!(readByte(GET_HL()) & 0x80));
+            SET_N(0);
+            SET_H(1);
+            registers.cycles += 2;
+            break;
+        case 0x7F:    // BIT A 7
+            SET_Z(!(registers.A & 0x80));
+            SET_N(0);
+            SET_H(1);
+            break;
     }
 }
