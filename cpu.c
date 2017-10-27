@@ -2420,5 +2420,205 @@ void cbPrefix(inst) {
             SET_N(0);
             SET_H(1);
             break;
+        case 0xC0:    // SET B 0
+            registers.B |= 0x01;
+            break;
+        case 0xC1:    // SET C 0
+            registers.C |= 0x01;
+            break;
+        case 0xC2:    // SET D 0
+            registers.D |= 0x01;
+            break;
+        case 0xC3:    // SET E 0
+            registers.E |= 0x01;
+            break;
+        case 0xC4:    // SET H 0
+            registers.H |= 0x01;
+            break;
+        case 0xC5:    // SET L 0
+            registers.L |= 0x01;
+            break;
+        case 0xC6:    // SET (HL) 0
+            SET_HL(GET_HL() | 0x01);
+            registers.cyles += 2;
+            break;
+        case 0xC7:    // SET A 0
+            registers.A |= 0x01;
+            break;
+        case 0xC8:    // SET B 1
+            registers.B |= 0x02;
+            break;
+        case 0xC9:    // SET C 1
+            registers.C |= 0x02;
+            break;
+        case 0xCA:    // SET D 1
+            registers.D |= 0x02;
+            break;
+        case 0xCB:    // SET E 1
+            registers.E |= 0x02;
+            break;
+        case 0xCC:    // SET H 1
+            registers.H |= 0x02;
+            break;
+        case 0xCD:    // SET L 1
+            registers.L |= 0x02;
+            break;
+        case 0xCE:    // SET (HL) 1
+            SET_HL(GET_HL() | 0x02);
+            registers.cyles += 2;
+            break;
+        case 0xCF:    // SET A 1
+            registers.A |= 0x02;
+            break;
+        case 0xD0:    // SET B 2
+            registers.B |= 0x04;
+            break;
+        case 0xD1:    // SET C 2
+            registers.C |= 0x04;
+            break;
+        case 0xD2:    // SET D 2
+            registers.D |= 0x04;
+            break;
+        case 0xD3:    // SET E 2
+            registers.E |= 0x04;
+            break;
+        case 0xD4:    // SET H 2
+            registers.H |= 0x04;
+            break;
+        case 0xD5:    // SET L 2
+            registers.L |= 0x04;
+            break;
+        case 0xD6:    // SET (HL) 2
+            SET_HL(GET_HL() | 0x04);
+            registers.cyles += 2;
+            break;
+        case 0xD7:    // SET A 2
+            registers.A |= 0x04;
+            break;
+        case 0xD8:    // SET B 3
+            registers.B |= 0x08;
+            break;
+        case 0xD9:    // SET C 3
+            registers.C |= 0x08;
+            break;
+        case 0xDA:    // SET D 3
+            registers.D |= 0x08;
+            break;
+        case 0xDB:    // SET E 3
+            registers.E |= 0x08;
+            break;
+        case 0xDC:    // SET H 3
+            registers.H |= 0x08;
+            break;
+        case 0xDD:    // SET L 3
+            registers.L |= 0x08;
+            break;
+        case 0xDE:    // SET (HL) 3
+            SET_HL(GET_HL() | 0x08);
+            registers.cyles += 2;
+            break;
+        case 0xDF:    // SET A 3
+            registers.A |= 0x08;
+            break;
+        case 0xE0:    // SET B 4
+            registers.B |= 0x10;
+            break;
+        case 0xE1:    // SET C 4
+            registers.C |= 0x10;
+            break;
+        case 0xE2:    // SET D 4
+            registers.D |= 0x10;
+            break;
+        case 0xE3:    // SET E 4
+            registers.E |= 0x10;
+            break;
+        case 0xE4:    // SET H 4
+            registers.H |= 0x10;
+            break;
+        case 0xE5:    // SET L 4
+            registers.L |= 0x10;
+            break;
+        case 0xE6:    // SET (HL) 4
+            SET_HL(GET_HL() | 0x10);
+            registers.cyles += 2;
+            break;
+        case 0xE7:    // SET A 4
+            registers.A |= 0x10;
+            break;
+        case 0xE8:    // SET B 5
+            registers.B |= 0x20;
+            break;
+        case 0xE9:    // SET C 5
+            registers.C |= 0x20;
+            break;
+        case 0xEA:    // SET D 5
+            registers.D |= 0x20;
+            break;
+        case 0xEB:    // SET E 5
+            registers.E |= 0x20;
+            break;
+        case 0xEC:    // SET H 5
+            registers.H |= 0x20;
+            break;
+        case 0xED:    // SET L 5
+            registers.L |= 0x20;
+            break;
+        case 0xEE:    // SET (HL) 5
+            SET_HL(GET_HL() | 0x20);
+            registers.cyles += 2;
+            break;
+        case 0xEF:    // SET A 5
+            registers.A |= 0x20;
+            break;
+        case 0xF0:    // SET B 6
+            registers.B |= 0x40;
+            break;
+        case 0xF1:    // SET C 6
+            registers.C |= 0x40;
+            break;
+        case 0xF2:    // SET D 6
+            registers.D |= 0x40;
+            break;
+        case 0xF3:    // SET E 6
+            registers.E |= 0x40;
+            break;
+        case 0xF4:    // SET H 6
+            registers.H |= 0x40;
+            break;
+        case 0xF5:    // SET L 6
+            registers.L |= 0x40;
+            break;
+        case 0xF6:    // SET (HL) 6
+            SET_HL(GET_HL() | 0x40);
+            registers.cyles += 2;
+            break;
+        case 0xF7:    // SET A 6
+            registers.A |= 0x40;
+            break;
+        case 0xF8:    // SET B 7
+            registers.B |= 0x80;
+            break;
+        case 0xF9:    // SET C 7
+            registers.C |= 0x80;
+            break;
+        case 0xFA:    // SET D 7
+            registers.D |= 0x80;
+            break;
+        case 0xFB:    // SET E 7
+            registers.E |= 0x80;
+            break;
+        case 0xFC:    // SET H 7
+            registers.H |= 0x80;
+            break;
+        case 0xFD:    // SET L 7
+            registers.L |= 0x80;
+            break;
+        case 0xFE:    // SET (HL) 7
+            SET_HL(GET_HL() | 0x80);
+            registers.cyles += 2;
+            break;
+        case 0xFF:    // SET A 7
+            registers.A |= 0x80;
+            break;
     }
 }
