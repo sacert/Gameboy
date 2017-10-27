@@ -2420,6 +2420,206 @@ void cbPrefix(inst) {
             SET_N(0);
             SET_H(1);
             break;
+        case 0x80:    // RES B 0
+            registers.B &= 0xFE;
+            break;
+        case 0x81:    // RES C 0
+            registers.C &= 0xFE;
+            break;
+        case 0x82:    // RES D 0
+            registers.D &= 0xFE;
+            break;
+        case 0x83:    // RES E 0
+            registers.E &= 0xFE;
+            break;
+        case 0x84:    // RES H 0
+            registers.H &= 0xFE;
+            break;
+        case 0x85:    // RES L 0
+            registers.L &= 0xFE;
+            break;
+        case 0x86:    // RES (HL) 0
+            SET_HL(GET_HL() & 0xFE);
+            registers.cyles += 2;
+            break;
+        case 0x87:    // RES A 0
+            registers.A &= 0xFE;
+            break;
+        case 0x88:    // RES B 1
+            registers.B &= 0xFD;
+            break;
+        case 0x89:    // RES C 1
+            registers.C &= 0xFD;
+            break;
+        case 0x8A:    // RES D 1
+            registers.D &= 0xFD;
+            break;
+        case 0x8B:    // RES E 1
+            registers.E &= 0xFD;
+            break;
+        case 0x8C:    // RES H 1
+            registers.H &= 0xFD;
+            break;
+        case 0x8D:    // RES L 1
+            registers.L &= 0xFD;
+            break;
+        case 0x8E:    // RES (HL) 1
+            SET_HL(GET_HL() & 0xFD);
+            registers.cyles += 2;
+            break;
+        case 0x8F:    // RES A 1
+            registers.A &= 0xFD;
+            break;
+        case 0x90:    // RES B 2
+            registers.B &= 0xFB;
+            break;
+        case 0x91:    // RES C 2
+            registers.C &= 0xFB;
+            break;
+        case 0x92:    // RES D 2
+            registers.D &= 0xFB;
+            break;
+        case 0x93:    // RES E 2
+            registers.E &= 0xFB;
+            break;
+        case 0x94:    // RES H 2
+            registers.H &= 0xFB;
+            break;
+        case 0x95:    // RES L 2
+            registers.L &= 0xFB;
+            break;
+        case 0x96:    // RES (HL) 2
+            SET_HL(GET_HL() & 0xFB);
+            registers.cyles += 2;
+            break;
+        case 0x97:    // RES A 2
+            registers.A &= 0xFB;
+            break;
+        case 0x98:    // RES B 3
+            registers.B &= 0xF7;
+            break;
+        case 0x99:    // RES C 3
+            registers.C &= 0xF7;
+            break;
+        case 0x9A:    // RES D 3
+            registers.D &= 0xF7;
+            break;
+        case 0x9B:    // RES E 3
+            registers.E &= 0xF7;
+            break;
+        case 0x9C:    // RES H 3
+            registers.H &= 0xF7;
+            break;
+        case 0x9D:    // RES L 3
+            registers.L &= 0xF7;
+            break;
+        case 0x9E:    // RES (HL) 3
+            SET_HL(GET_HL() & 0xF7);
+            registers.cyles += 2;
+            break;
+        case 0x9F:    // RES A 3
+            registers.A &= 0xF7;
+            break;
+        case 0xA0:    // RES B 4
+            registers.B &= 0xEF;
+            break;
+        case 0xA1:    // RES C 4
+            registers.C &= 0xEF;
+            break;
+        case 0xA2:    // RES D 4
+            registers.D &= 0xEF;
+            break;
+        case 0xA3:    // RES E 4
+            registers.E &= 0xEF;
+            break;
+        case 0xA4:    // RES H 4
+            registers.H &= 0xEF;
+            break;
+        case 0xA5:    // RES L 4
+            registers.L &= 0xEF;
+            break;
+        case 0xA6:    // RES (HL) 4
+            SET_HL(GET_HL() & 0xEF);
+            registers.cyles += 2;
+            break;
+        case 0xA7:    // RES A 4
+            registers.A &= 0xEF;
+            break;
+        case 0xA8:    // RES B 5
+            registers.B &= 0xDF;
+            break;
+        case 0xA9:    // RES C 5
+            registers.C &= 0xDF;
+            break;
+        case 0xAA:    // RES D 5
+            registers.D &= 0xDF;
+            break;
+        case 0xAB:    // RES E 5
+            registers.E &= 0xDF;
+            break;
+        case 0xAC:    // RES H 5
+            registers.H &= 0xDF;
+            break;
+        case 0xAD:    // RES L 5
+            registers.L &= 0xDF;
+            break;
+        case 0xAE:    // RES (HL) 5
+            SET_HL(GET_HL() & 0xDF);
+            registers.cyles += 2;
+            break;
+        case 0xAF:    // RES A 5
+            registers.A &= 0xDF;
+            break;
+        case 0xB0:    // RES B 6
+            registers.B &= 0xBF;
+            break;
+        case 0xB1:    // RES C 6
+            registers.C &= 0xBF;
+            break;
+        case 0xB2:    // RES D 6
+            registers.D &= 0xBF;
+            break;
+        case 0xB3:    // RES E 6
+            registers.E &= 0xBF;
+            break;
+        case 0xB4:    // RES H 6
+            registers.H &= 0xBF;
+            break;
+        case 0xB5:    // RES L 6
+            registers.L &= 0xBF;
+            break;
+        case 0xB6:    // RES (HL) 6
+            SET_HL(GET_HL() & 0xBF);
+            registers.cyles += 2;
+            break;
+        case 0xB7:    // RES A 6
+            registers.A &= 0x7F;
+            break;
+        case 0xB8:    // RES B 7
+            registers.B &= 0x7F;
+            break;
+        case 0xB9:    // RES C 7
+            registers.C &= 0x7F;
+            break;
+        case 0xBA:    // RES D 7
+            registers.D &= 0x7F;
+            break;
+        case 0xBB:    // RES E 7
+            registers.E &= 0x7F;
+            break;
+        case 0xBC:    // RES H 7
+            registers.H &= 0x7F;
+            break;
+        case 0xBD:    // RES L 7
+            registers.L &= 0x7F;
+            break;
+        case 0xBE:    // RES (HL) 7
+            SET_HL(GET_HL() & 0x7F);
+            registers.cyles += 2;
+            break;
+        case 0xBF:    // RES A 7
+            registers.A &= 0x7F;
+            break;
         case 0xC0:    // SET B 0
             registers.B |= 0x01;
             break;
