@@ -1379,6 +1379,10 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 3;
             break;
+        case 0xC3:    // JP nn
+            registers.PC = readShort(registers.PC+1);
+            registers.cycles += 3;
+            break;
         case 0xC5:    // PUSH BC
             registers.SP -= 2;
             writeShort(registers.SP, GET_BC());
