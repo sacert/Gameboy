@@ -1428,6 +1428,17 @@ void cpuCycle(void) {
             registers.PC = readShort(registers.PC+1);
             registers.cycles += 3;
             break;
+        case 0xC4:    // CALL NZ,nn
+            if (FLAG_Z == 0) {
+                registers.SP -= 2;
+                writeShort(registers.SP, registers.PC+3);
+                registers.PC = readShort(registers.PC+1);
+                registers.cycles += 6;
+            } else {
+                registers.PC += 3;
+                registers.cycles += 3;
+            }
+            break;
         case 0xC5:    // PUSH BC
             registers.SP -= 2;
             writeShort(registers.SP, GET_BC());
@@ -1458,6 +1469,23 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xCC:    // CALL Z,nn
+            if (FLAG_Z == 1) {
+                registers.SP -= 2;
+                writeShort(registers.SP, registers.PC+3);
+                registers.PC = readShort(registers.PC+1);
+                registers.cycles += 6;
+            } else {
+                registers.PC += 3;
+                registers.cycles += 3;
+            }
+            break;
+        case 0xCD:    // CALL n
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+3);
+            registers.PC = readShort(registers.PC+1);
+            registers.cycles += 6;
+            break;
         case 0xCE:    // ADC A,n
             int i = registers.A + readByte(registers.PC) + FLAG_C;
             SET_Z(!i);
@@ -1483,6 +1511,17 @@ void cpuCycle(void) {
                 registers.cyles += 2;
             }
             break;
+        case 0xD4:    // CALL NC,nn
+            if (FLAG_C == 0) {
+                registers.SP -= 2;
+                writeShort(registers.SP, registers.PC+3);
+                registers.PC = readShort(registers.PC+1);
+                registers.cycles += 6;
+            } else {
+                registers.PC += 3;
+                registers.cycles += 3;
+            }
+            break;
         case 0xD5:    // PUSH DE
             registers.SP -= 2;
             writeShort(registers.SP, GET_DE());
@@ -1506,6 +1545,17 @@ void cpuCycle(void) {
             } else {
                 registers.PC += 3;
                 registers.cyles += 2;
+            }
+            break;
+        case 0xDC:    // CALL C,nn
+            if (FLAG_C == 1) {
+                registers.SP -= 2;
+                writeShort(registers.SP, registers.PC+3);
+                registers.PC = readShort(registers.PC+1);
+                registers.cycles += 6;
+            } else {
+                registers.PC += 3;
+                registers.cycles += 3;
             }
             break;
         case 0xE0:    // LD ($FF00+n), A
