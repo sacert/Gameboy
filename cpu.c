@@ -1409,6 +1409,16 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0xC0:    // RET NZ
+            if (FLAG_Z == 0) {
+                registers.PC = readShort(registers.SP);
+                registers.SP += 2;
+                registers.cycles += 5;
+            } else {
+                registers.PC += 1;
+                registers.cyles += 2;
+            }
+            break;
         case 0xC1:    // POP BC
             SET_BC(readShort(registers.SP) & 0xFFF0);
             registers.SP += 2;
@@ -1455,6 +1465,27 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xC7:    // RST 00
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x00;
+            registers.cycles += 4;
+            break;
+        case 0xC8:    // RET Z
+            if (FLAG_Z == 1) {
+                registers.PC = readShort(registers.SP);
+                registers.SP += 2;
+                registers.cycles += 5;
+            } else {
+                registers.PC += 1;
+                registers.cyles += 2;
+            }
+            break;
+        case 0xC9:    // RET
+            registers.PC = readShort(registers.SP);
+            registers.SP += 2;
+            registers.cycles += 4;
+            break;
         case 0xCA:    // JP Z,nn
             if (FLAG_Z == 1) {
                 registers.PC = readShort(registers.PC+1);
@@ -1496,11 +1527,27 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xCF:    // RST 08
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x08;
+            registers.cycles += 4;
+            break;
         case 0xD1:    // POP DE
             SET_DE(readShort(registers.SP) & 0xFFF0);
             registers.SP += 2;
             registers.PC += 1;
             registers.cycles += 3;
+            break;
+        case 0xD0:    // RET NC
+            if (FLAG_C == 0) {
+                registers.PC = readShort(registers.SP);
+                registers.SP += 2;
+                registers.cycles += 5;
+            } else {
+                registers.PC += 1;
+                registers.cyles += 2;
+            }
             break;
         case 0xD2:    // JP NC,nn
             if (FLAG_C == 0) {
@@ -1538,6 +1585,28 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xD7:    // RST 10
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x10;
+            registers.cycles += 4;
+            break;
+        case 0xD8:    // RET C
+            if (FLAG_C == 1) {
+                registers.PC = readShort(registers.SP);
+                registers.SP += 2;
+                registers.cycles += 5;
+            } else {
+                registers.PC += 1;
+                registers.cyles += 2;
+            }
+            break;
+        case 0xC0:    // RET NZ
+            registers.PC = readShort(registers.SP);
+            registers.SP += 2;
+            registers.cycles += 4;
+            // enable interrupt here
+            break;
         case 0xDA:    // JP C,nn
             if (FLAG_C == 1) {
                 registers.PC = readShort(registers.PC+1);
@@ -1557,6 +1626,12 @@ void cpuCycle(void) {
                 registers.PC += 3;
                 registers.cycles += 3;
             }
+            break;
+        case 0xDF:    // RST 18
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x00;
+            registers.cycles += 4;
             break;
         case 0xE0:    // LD ($FF00+n), A
             writeByte(0xFF00 + readByte(registers.PC), registers.A);
@@ -1589,6 +1664,12 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
+        case 0xE7:    // RST 20
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x20;
+            registers.cycles += 4;
+            break;
         case 0xE8:    // ADD SP,n
             unsigned short s = registers.SP;
             registers.SP += readByte(registers.PC);
@@ -1614,6 +1695,12 @@ void cpuCycle(void) {
             SET_C(0);
             registers.PC += 2;
             registers.cycles += 2;
+            break;
+        case 0xEF:    // RST 28
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x28;
+            registers.cycles += 4;
             break;
         case 0xF0:    // LD A, ($FF00+n)
             registers.A = readByte(registers.PC+ 0xFF00);
@@ -1645,6 +1732,18 @@ void cpuCycle(void) {
             SET_C(0);
             registers.PC += 2;
             registers.cycles += 2;
+            break;
+        case 0xE7:    // RST 30
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x30;
+            registers.cycles += 4;
+            break;
+        case 0xEF:    // RST 38
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x38;
+            registers.cycles += 4;
             break;
         case 0xF8:    // LD HL, SP + n
             SET_HL(registers.SP + readByte(registers.PC+1));
