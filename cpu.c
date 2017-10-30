@@ -1,44 +1,15 @@
-#define SET_AF(x) do {registers.A = ((x & 0xFF00) >> 8); registers.F = (x&0x00FF);} while(0) // multi-line macro
-#define SET_BC(x) do {registers.B = ((x & 0xFF00) >> 8); registers.C = (x&0x00FF);} while(0)
-#define SET_DE(x) do {registers.D = ((x & 0xFF00) >> 8); registers.E = (x&0x00FF);} while(0)
-#define SET_HL(x) do {registers.H = ((x & 0xFF00) >> 8); registers.L = (x&0x00FF);} while(0)
-
-#define GET_AF() ((registers.A << 8) | registers.F)
-#define GET_BC() ((registers.B << 8) | registers.C)
-#define GET_DE() ((registers.D << 8) | registers.E)
-#define GET_HL() ((registers.H << 8) | registers.L)
-
-#define SET_Z(x) ((registers.F & 0x7F) | (x << 7))
-#define SET_N(x) ((registers.F & 0xBF) | (x << 6))
-#define SET_H(x) ((registers.F & 0xDF) | (x << 5))
-#define SET_C(x) ((registers.F & 0xEF) | (x << 4))
-
-#define FLAG_Z ((registers.F >> 7) & 0x1)
-#define FLAG_N ((registers.F >> 6) & 0x1)
-#define FLAG_H ((registers.F >> 5) & 0x1)
-#define FLAG_C ((registers.F >> 4) & 0x1)
-
-struct registers {
-    unsigned char A;
-    unsigned char F; // flags: Z N H C
-
-    unsigned char B;
-    unsigned char C;
-
-    unsigned char D;
-    unsigned char E;
-
-    unsigned char H;
-    unsigned char L;
-
-    unsigned short SP;
-    unsigned short PC;
-
-    unsigned int cycles;
-} registers;
+#import "cpu.h"
 
 struct registers registers;
-static int halt = 0; // varify if static is needed
+static int halted = 0;
+
+void cpu_interrupt(unsigned short address) {
+    interrupt.master = 0;
+    registers.PC -= 2;
+    writeShort(registers.SP, registers.PC);
+    registers.PC = address;
+    interrupt.enable = 0;
+}
 
 void reset(void) {
 
@@ -48,9 +19,9 @@ void reset(void) {
 
 void cpuCycle(void) {
 
-    if (halt) {
-      registers.cycles += 1;
-      return;
+    if (halted) {
+        registers.cycles += 1;
+        return;
     }
 
     unsigned char instruction = readByte(registers.PC);
@@ -119,6 +90,7 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFFFF) < (s & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
+            break;
         case 0x0A:    // LD A,(BC)
             registers.A = readByte(GET_BC());
             registers.PC += 1;
@@ -137,7 +109,7 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
-        case 0x0C:    // DEF C
+        case 0x0D:    // DEF C
             registers.C -= 1;
             SET_Z(registers.C);
             SET_N(1);
@@ -158,6 +130,11 @@ void cpuCycle(void) {
             SET_N(0);
             SET_H(0);
             SET_C(s);
+            registers.PC += 1;
+            registers.cycles += 1;
+            break;
+        case 0x10:    // STOP
+            halted = 1;
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -755,7 +732,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x76:    // HALT
-            halt = 1;
+            halted = 1;
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -798,11 +775,6 @@ void cpuCycle(void) {
             registers.A = readByte(GET_HL());
             registers.PC += 1;
             registers.cycles += 2;
-            break;
-        case 0xFA:    // LD A,(nn)
-            registers.A = readShort(registers.PC+1);
-            registers.PC += 3;
-            registers.cycles += 4;
             break;
         case 0x7F:    // LD A,A
             registers.A = registers.A;
@@ -1718,6 +1690,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0xF3:    // DI
+            registers.PC += 1;
+            registers.cycles += 1;
+            interrupt.master = 0;
+            break;
         case 0xF5:    // PUSH AF
             registers.SP -= 2;
             writeShort(registers.SP, GET_AF());
@@ -1733,16 +1710,10 @@ void cpuCycle(void) {
             registers.PC += 2;
             registers.cycles += 2;
             break;
-        case 0xE7:    // RST 30
+        case 0xF7:    // RST 30
             registers.SP -= 2;
             writeShort(registers.SP, registers.PC+1);
             registers.PC = 0x30;
-            registers.cycles += 4;
-            break;
-        case 0xEF:    // RST 38
-            registers.SP -= 2;
-            writeShort(registers.SP, registers.PC+1);
-            registers.PC = 0x38;
             registers.cycles += 4;
             break;
         case 0xF8:    // LD HL, SP + n
@@ -1759,6 +1730,16 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 2;
             break;
+        case 0xFA:    // LD A,(nn)
+            registers.A = readShort(registers.PC+1);
+            registers.PC += 3;
+            registers.cycles += 4;
+            break;
+        case 0xFB:    // DI
+            registers.PC += 1;
+            registers.cycles += 1;
+            interrupt.master = 1;
+            break;
         case 0xFE:    // CP n
             SET_Z(registers.A == readByte(registers.PC));
             SET_N(1);
@@ -1766,6 +1747,12 @@ void cpuCycle(void) {
             SET_C(registers.A < readByte(registers.PC));
             registers.PC += 2;
             registers.cycles += 2;
+            break;
+        case 0xFF:    // RST 38
+            registers.SP -= 2;
+            writeShort(registers.SP, registers.PC+1);
+            registers.PC = 0x38;
+            registers.cycles += 4;
             break;
         default:
             printf("Undefined instruction.");

@@ -1,4 +1,5 @@
 #import "interrupt.h"
+#import "cpu.h" 
 
 struct interrupt interrupt;
 
