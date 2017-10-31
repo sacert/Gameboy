@@ -1,4 +1,5 @@
 #include "MMU.h"
+#include "interrupt.h"
 
 // 0xFFFF = Interrupt Enable Register
 
@@ -12,8 +13,14 @@ unsigned char readByte(unsigned short address) {
         return sram[address - 0xA000];
     else if (0xC000 <= address && address <= 0xDFFF)
         return wram[address - 0xC000];
-    else if (0xE000 <= address && address <= 0xFDFF)
-        return oam[address - 0xE000];
+    else if (0xE000 <= address && address <= 0xFDFF) // echo of wram
+        return wram[address - 0xE000];
+    else if (0xFE00 <= address && address <= 0xFEFF)
+        return oam[address - 0xFE00];
+    else if (address == 0xFF0F)
+        return interrupt.flags;
+    else if (address == 0xFFFF)
+        return interrupt.enable;
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
     		return io[address - 0xff00];
     else if (0xFF80 <= address && address <= 0xFFFE)
@@ -37,6 +44,10 @@ void writeByte(unsigned short address, unsigned char value) {
         wram[address - 0xC000] = value;
     else if (0xE000 <= address && address <= 0xFDFF)
         oam[address - 0xE000] = value;
+    else if (address == 0xFF0F)
+        interrupt.flags = address;
+    else if (address == 0xFFFF)
+        interrupt.enable = address;
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
     		io[address - 0xff00] = value;
     else if (0xFF80 <= address && address <= 0xFFFE)
