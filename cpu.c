@@ -1,4 +1,6 @@
 #import "cpu.h"
+#import "MMU.h"
+#import "interrupt.h"
 
 struct registers registers;
 static int halted = 0;

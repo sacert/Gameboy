@@ -37,7 +37,7 @@ struct registers {
     unsigned int cycles;
 } registers;
 
-void cpu_interrupt(void);
+void cpu_interrupt(unsigned short address);
 void reset(void);
 void cpuCycle(void);
 void cbPrefix(void);
