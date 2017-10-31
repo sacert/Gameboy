@@ -43,7 +43,9 @@ void writeByte(unsigned short address, unsigned char value) {
     else if (0xC000 <= address && address <= 0xDFFF)
         wram[address - 0xC000] = value;
     else if (0xE000 <= address && address <= 0xFDFF)
-        oam[address - 0xE000] = value;
+        vram[address - 0xE000] = value;
+    else if (0xFE00 <= address && address <= 0xFEFF)
+        oam[address - 0xFE00] = value;
     else if (address == 0xFF0F)
         interrupt.flags = address;
     else if (address == 0xFFFF)
