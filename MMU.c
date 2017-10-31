@@ -1,12 +1,12 @@
+#include <string.h>
+#include "rom.h"
 #include "MMU.h"
 #include "interrupt.h"
-
-// 0xFFFF = Interrupt Enable Register
 
 unsigned char readByte(unsigned short address) {
 
     if (0x0000 <= address && address <= 0x7FFF)
-        return rom[address];
+        return cart[address];
     else if (0x8000 <= address && address <= 0x9FFF)
         return vram[address - 0x8000];
     else if (0xA000 <= address && address <= 0xBFFF)
@@ -59,4 +59,8 @@ void writeByte(unsigned short address, unsigned char value) {
 void writeShort(unsigned short address, unsigned short value) {
     writeByte(address,(value & 0x00FF));
     writeByte(address+1,(value & 0xFF00) >> 8);
+}
+
+void changeMemoryBank(int bankNum) {
+    memcpy(&cart[0x4000],&rom.romBytes[bankNum * 0x4000],0x4000);
 }

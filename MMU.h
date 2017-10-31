@@ -1,4 +1,4 @@
-unsigned char *rom;   // ROM (Cart 1 & 2)
+unsigned char cart[0x8000];   // ROM (Cart 1 & 2)
 unsigned char vram[0x2000];  // video RAM
 unsigned char sram[0x2000];  // switchable RAM
 unsigned char wram[0x2000];  // working RAM

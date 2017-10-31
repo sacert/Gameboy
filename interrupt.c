@@ -1,5 +1,5 @@
 #import "interrupt.h"
-#import "cpu.h" 
+#import "cpu.h"
 
 struct interrupt interrupt;
 
@@ -9,27 +9,27 @@ void interruptCycle(void) {
         // get which interrupt is currently being executed
         unsigned char inter = interrupt.enable & interrupt.flags;
 
-        if (fire & VBLANK) {
+        if (inter & VBLANK) {
             interrupt.flags &= ~VBLANK; // turn off the flag
             cpu_interrupt(0x40);
         }
 
-        if (fire & LCDSTAT) {
+        if (inter & LCDSTAT) {
             interrupt.flags &= ~LCDSTAT;
             cpu_interrupt(0x48);
         }
 
-        if (fire & TIMER) {
+        if (inter & TIMER) {
             interrupt.flags &= ~TIMER;
             cpu_interrupt(0x50);
         }
 
-        if (fire & SERIAL) {
+        if (inter & SERIAL) {
             interrupt.flags &= ~SERIAL;
             cpu_interrupt(0x58);
         }
 
-        if (fire & JOYPAD) {
+        if (inter & JOYPAD) {
             interrupt.flags &= ~JOYPAD;
             cpu_interrupt(0x60);
         }
