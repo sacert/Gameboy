@@ -1,6 +1,7 @@
 #import "cpu.h"
 #import "MMU.h"
 #import "interrupt.h"
+#include <stdio.h>
 
 struct registers registers;
 static int halted = 0;
@@ -26,6 +27,10 @@ void cpuCycle(void) {
         return;
     }
 
+    int i;
+    unsigned char s;
+    unsigned short t;
+    unsigned int u;
     unsigned char instruction = readByte(registers.PC);
 
     switch (instruction) {
@@ -69,7 +74,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x07:    // RLCA
-            unsigned char s = registers.A;
+            s = registers.A;
             s = (s >> 7);
             registers.A = (registers.A << 1) | s;
             SET_Z(!registers.A);
@@ -80,16 +85,16 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x08:    // LD (nn),SP
-            writeShort(readShort(registers.PC+1, registers.SP));
+            writeShort(readShort(registers.PC+1), registers.SP);
             registers.PC += 3;
             registers.cycles += 5;
             break;
         case 0x09:    // ADD HL,BC
-            unsigned short s = GET_HL();
-            SET_HL(s + GET_BC());
+            t = GET_HL();
+            SET_HL(t + GET_BC());
             SET_N(0);
-            SET_H((GET_HL() & 0xFFF) < (s & 0xFFF));
-            SET_C((GET_HL() & 0xFFFF) < (s & 0xFFFF));
+            SET_H((GET_HL() & 0xFFF) < (t & 0xFFF));
+            SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -125,8 +130,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x0F:    // RRCA
-            unsigned char s = registers.A;
-            s = (s & 0x1);
+            s = (registers.A & 0x1);
             registers.A = (registers.A >> 1) | (s << 7);
             SET_Z(!registers.A);
             SET_N(0);
@@ -177,9 +181,9 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x17:    // RLA
-            unsigned char t = registers.A;
+            s = registers.A;
             registers.A = (registers.A << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
@@ -191,11 +195,11 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x19:    // ADD HL,DE
-            unsigned short s = GET_HL();
-            SET_HL(s + GET_DE());
+            t = GET_HL();
+            SET_HL(t + GET_DE());
             SET_N(0);
-            SET_H((GET_HL() & 0xFFF) < (s & 0xFFF));
-            SET_C((GET_HL() & 0xFFFF) < (s & 0xFFFF));
+            SET_H((GET_HL() & 0xFFF) < (t & 0xFFF));
+            SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
         case 0x1A:    // LD A,(DE)
@@ -230,10 +234,9 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x1F:    // RRA
-            unsigned char t = registers.A;
-            t = (t & 0x1);
+            s = (registers.A & 0x1);
             registers.A = (registers.A >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
@@ -286,7 +289,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x27:    // DAA
-            unsigned int s = registers.A;
+            u = registers.A;
 
             if (FLAG_N) {
               if(FLAG_H)
@@ -294,14 +297,14 @@ void cpuCycle(void) {
               if(FLAG_C)
                 registers.A -= 0x60;
             } else {
-              if(flag_H || (registers.A & 0xF) > 9)
+              if(FLAG_H || (registers.A & 0xF) > 9)
                 registers.A += 0x06;
-              if(flag_C || registers.A > 0x9F)
+              if(FLAG_C || registers.A > 0x9F)
                 registers.A += 0x60;
             }
             SET_H(0);
             SET_Z(!registers.A);
-            SET_C((registers.A & 0xFF) < (s & 0xFF));
+            SET_C((registers.A & 0xFF) < (u & 0xFF));
             registers.PC += 1;
             registers.cycles += 1;
         case 0x28:    // JP Z
@@ -313,11 +316,11 @@ void cpuCycle(void) {
             }
             break;
         case 0x29:    // ADD HL,HL
-            unsigned short s = GET_HL();
-            SET_HL(s + GET_HL());
+            t = GET_HL();
+            SET_HL(t + GET_HL());
             SET_N(0);
-            SET_H((GET_HL() & 0xFFF) < (s & 0xFFF));
-            SET_C((GET_HL() & 0xFFFF) < (s & 0xFFFF));
+            SET_H((GET_HL() & 0xFFF) < (t & 0xFFF));
+            SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
         case 0x2A:    // LDI A,(HL)
@@ -384,20 +387,20 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x34:    // INC (HL)
-            unsigned char t = readByte(GET_HL()) + 1;
+            s = readByte(GET_HL()) + 1;
             writeByte(GET_HL(), t);
-            SET_Z(!t);
+            SET_Z(!s);
             SET_N(0);
-            SET_H((t & 0xF) < ((t-1) & 0xF));
+            SET_H((s & 0xF) < ((s-1) & 0xF));
             registers.PC += 1;
             registers.cycles += 2;
             break;
         case 0x35:    // DEC (HL)
-            unsigned char t = readByte(GET_HL()) - 1;
-            writeByte(GET_HL(), t);
-            SET_Z(t);
+            s = readByte(GET_HL()) - 1;
+            writeByte(GET_HL(), s);
+            SET_Z(s);
             SET_N(1);
-            SET_H((t & 0xF) > ((t-1) & 0xF));
+            SET_H((s & 0xF) > ((s-1) & 0xF));
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -422,11 +425,11 @@ void cpuCycle(void) {
             }
             break;
         case 0x39:    // ADD HL,SP
-            unsigned short s = GET_HL();
-            SET_HL(s + registers.SP);
+            t = GET_HL();
+            SET_HL(t + registers.SP);
             SET_N(0);
-            SET_H((GET_HL() & 0xFFF) < (s & 0xFFF));
-            SET_C((GET_HL() & 0xFFFF) < (s & 0xFFFF));
+            SET_H((GET_HL() & 0xFFF) < (t & 0xFFF));
+            SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
         case 0x3A:    // LDD A, (HL)
@@ -784,7 +787,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x80:    // ADD A,B
-            int i = registers.A + registers.B;
+            i = registers.A + registers.B;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -794,7 +797,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x81:    // ADD A,C
-            int i = registers.A + registers.C;
+            i = registers.A + registers.C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -804,7 +807,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x82:    // ADD A,D
-            int i = registers.A + registers.D;
+            i = registers.A + registers.D;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -814,7 +817,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x83:    // ADD A,E
-            int i = registers.A + registers.E;
+            i = registers.A + registers.E;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -824,7 +827,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x84:    // ADD A,H
-            int i = registers.A + registers.H;
+            i = registers.A + registers.H;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -834,7 +837,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x85:    // ADD A,L
-            int i = registers.A + registers.L;
+            i = registers.A + registers.L;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -844,7 +847,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x86:    // ADD A,(HL)
-            int i = registers.A + readByte(GET_HL);
+            i = registers.A + readByte(GET_HL());
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -854,7 +857,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x87:    // ADD A,A
-            int i = registers.A + registers.A;
+            i = registers.A + registers.A;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -864,7 +867,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x88:    // ADC A,B
-            int i = registers.A + registers.B + FLAG_C;
+            i = registers.A + registers.B + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -874,7 +877,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x89:    // ADC A,C
-            int i = registers.A + registers.C + FLAG_C;
+            i = registers.A + registers.C + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -884,7 +887,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x8A:    // ADC A,D
-            int i = registers.A + registers.D + FLAG_C;
+            i = registers.A + registers.D + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -894,7 +897,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x8B:    // ADC A,E
-            int i = registers.A + registers.E + FLAG_C;
+            i = registers.A + registers.E + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -904,7 +907,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x8C:    // ADC A,H
-            int i = registers.A + registers.H + FLAG_C;
+            i = registers.A + registers.H + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -914,7 +917,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x8D:    // ADC A,L
-            int i = registers.A + registers.L + FLAG_C;
+            i = registers.A + registers.L + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -924,7 +927,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x8E:    // ADC A,(HL)
-            int i = registers.A + GET_HL() + FLAG_C;
+            i = registers.A + GET_HL() + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -934,7 +937,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x8F:    // ADC A,A
-            int i = registers.A + registers.A + FLAG_C;
+            i = registers.A + registers.A + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -944,7 +947,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x90:    // SUB A,B
-            int i = registers.A - registers.B;
+            i = registers.A - registers.B;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -954,7 +957,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x91:    // SUB A,C
-            int i = registers.A - registers.C;
+            i = registers.A - registers.C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -964,7 +967,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x92:    // SUB A,D
-            int i = registers.A - registers.D;
+            i = registers.A - registers.D;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -974,7 +977,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x93:    // SUB A,E
-            int i = registers.A - registers.E;
+            i = registers.A - registers.E;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -984,7 +987,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x94:    // SUB A,H
-            int i = registers.A - registers.B;
+            i = registers.A - registers.B;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -994,7 +997,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x95:    // SUB A,L
-            int i = registers.A - registers.L;
+            i = registers.A - registers.L;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1004,7 +1007,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x96:    // SUB A,(HL)
-            int i = registers.A - GET_HL;
+            i = registers.A - GET_HL();
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1014,7 +1017,7 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0x97:    // SUB A,A
-            int i = registers.A - registers.A;
+            i = registers.A - registers.A;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1024,7 +1027,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x98:    // SBC A,B
-            int i = registers.A - registers.B + FLAG_C;
+            i = registers.A - registers.B + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1034,7 +1037,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x99:    // SBC A,C
-            int i = registers.A - registers.C + FLAG_C;
+            i = registers.A - registers.C + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1044,7 +1047,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9A:    // SBC A,D
-            int i = registers.A - registers.D + FLAG_C;
+            i = registers.A - registers.D + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1054,7 +1057,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9B:    // SBC A,E
-            int i = registers.A - registers.E + FLAG_C;
+            i = registers.A - registers.E + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1064,7 +1067,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9C:    // SBC A,H
-            int i = registers.A - registers.H + FLAG_C;
+            i = registers.A - registers.H + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1074,7 +1077,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9D:    // SBC A,L
-            int i = registers.A - registers.L + FLAG_C;
+            i = registers.A - registers.L + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1084,7 +1087,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9E:    // SBC A,(HL)
-            int i = registers.A - readByte(GET_HL()) + FLAG_C;
+            i = registers.A - readByte(GET_HL()) + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1094,7 +1097,7 @@ void cpuCycle(void) {
             registers.cycles += 1;
             break;
         case 0x9F:    // SBC A,A
-            int i = registers.A - registers.A + FLAG_C;
+            i = registers.A - registers.A + FLAG_C;
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1107,7 +1110,7 @@ void cpuCycle(void) {
             registers.A &= registers.B;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1116,7 +1119,7 @@ void cpuCycle(void) {
             registers.A &= registers.C;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1125,7 +1128,7 @@ void cpuCycle(void) {
             registers.A &= registers.D;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1134,7 +1137,7 @@ void cpuCycle(void) {
             registers.A &= registers.E;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1143,7 +1146,7 @@ void cpuCycle(void) {
             registers.A &= registers.H;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1152,7 +1155,7 @@ void cpuCycle(void) {
             registers.A &= registers.L;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1161,7 +1164,7 @@ void cpuCycle(void) {
             registers.A &= readByte(GET_HL());
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 2;
@@ -1170,7 +1173,7 @@ void cpuCycle(void) {
             registers.A &= registers.A;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1179,7 +1182,7 @@ void cpuCycle(void) {
             registers.A ^= registers.B;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1188,7 +1191,7 @@ void cpuCycle(void) {
             registers.A ^= registers.C;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1197,7 +1200,7 @@ void cpuCycle(void) {
             registers.A ^= registers.D;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1206,7 +1209,7 @@ void cpuCycle(void) {
             registers.A ^= registers.E;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1215,7 +1218,7 @@ void cpuCycle(void) {
             registers.A ^= registers.H;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1224,7 +1227,7 @@ void cpuCycle(void) {
             registers.A ^= registers.L;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1233,7 +1236,7 @@ void cpuCycle(void) {
             registers.A ^= readByte(GET_HL());
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1242,7 +1245,7 @@ void cpuCycle(void) {
             registers.A ^= registers.A;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 2;
@@ -1251,7 +1254,7 @@ void cpuCycle(void) {
             registers.A |= registers.B;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1260,7 +1263,7 @@ void cpuCycle(void) {
             registers.A |= registers.C;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1269,7 +1272,7 @@ void cpuCycle(void) {
             registers.A |= registers.D;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1278,7 +1281,7 @@ void cpuCycle(void) {
             registers.A |= registers.E;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1287,7 +1290,7 @@ void cpuCycle(void) {
             registers.A |= registers.H;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1296,7 +1299,7 @@ void cpuCycle(void) {
             registers.A |= registers.L;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1305,7 +1308,7 @@ void cpuCycle(void) {
             registers.A |= readByte(GET_HL());
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 2;
@@ -1314,7 +1317,7 @@ void cpuCycle(void) {
             registers.A |= registers.A;
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 1;
             registers.cycles += 1;
@@ -1390,7 +1393,7 @@ void cpuCycle(void) {
                 registers.cycles += 5;
             } else {
                 registers.PC += 1;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xC1:    // POP BC
@@ -1402,10 +1405,10 @@ void cpuCycle(void) {
         case 0xC2:    // JP NZ,nn
             if (FLAG_Z == 0) {
                 registers.PC = readShort(registers.PC+1);
-                registers.cyles += 3;
+                registers.cycles += 3;
             } else {
                 registers.PC += 3;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xC3:    // JP nn
@@ -1430,7 +1433,7 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         case 0xC6:    // ADD A,n
-            int i = registers.A + readByte(registers.PC);
+            i = registers.A + readByte(registers.PC);
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -1452,7 +1455,7 @@ void cpuCycle(void) {
                 registers.cycles += 5;
             } else {
                 registers.PC += 1;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xC9:    // RET
@@ -1463,14 +1466,14 @@ void cpuCycle(void) {
         case 0xCA:    // JP Z,nn
             if (FLAG_Z == 1) {
                 registers.PC = readShort(registers.PC+1);
-                registers.cyles += 3;
+                registers.cycles += 3;
             } else {
                 registers.PC += 3;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xCB:    // Prefix
-            cbPrefix(register.PC+1);
+            cbPrefix(registers.PC+1);
             registers.PC += 2;
             registers.cycles += 2;
             break;
@@ -1492,7 +1495,7 @@ void cpuCycle(void) {
             registers.cycles += 6;
             break;
         case 0xCE:    // ADC A,n
-            int i = registers.A + readByte(registers.PC) + FLAG_C;
+            i = registers.A + readByte(registers.PC) + FLAG_C;
             SET_Z(!i);
             SET_N(0);
             SET_H((i & 0xF) < (registers.A & 0xF));
@@ -1520,16 +1523,16 @@ void cpuCycle(void) {
                 registers.cycles += 5;
             } else {
                 registers.PC += 1;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xD2:    // JP NC,nn
             if (FLAG_C == 0) {
                 registers.PC = readShort(registers.PC+1);
-                registers.cyles += 3;
+                registers.cycles += 3;
             } else {
                 registers.PC += 3;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xD4:    // CALL NC,nn
@@ -1550,7 +1553,7 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         case 0xD6:    // SUB A,n
-            int i = registers.A - readByte(registers.PC);
+            i = registers.A - readByte(registers.PC);
             SET_Z(i);
             SET_N(1);
             SET_H((i & 0xF) > (registers.A & 0xF));
@@ -1572,22 +1575,22 @@ void cpuCycle(void) {
                 registers.cycles += 5;
             } else {
                 registers.PC += 1;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
-        case 0xC0:    // RET NZ
+        case 0xD9:    // RET NZ
             registers.PC = readShort(registers.SP);
             registers.SP += 2;
             registers.cycles += 4;
-            // enable interrupt here
+            interrupt.master = 1;
             break;
         case 0xDA:    // JP C,nn
             if (FLAG_C == 1) {
                 registers.PC = readShort(registers.PC+1);
-                registers.cyles += 3;
+                registers.cycles += 3;
             } else {
                 registers.PC += 3;
-                registers.cyles += 2;
+                registers.cycles += 2;
             }
             break;
         case 0xDC:    // CALL C,nn
@@ -1633,7 +1636,7 @@ void cpuCycle(void) {
             registers.A &= readByte(registers.PC);
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((1);
+            SET_H(1);
             SET_C(0);
             registers.PC += 2;
             registers.cycles += 2;
@@ -1645,11 +1648,11 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         case 0xE8:    // ADD SP,n
-            unsigned short s = registers.SP;
+            t = registers.SP;
             registers.SP += readByte(registers.PC);
             SET_N(0);
-            SET_H((GET_HL() & 0xF) < (s & 0xF));
-            SET_C((GET_HL() & 0xFF) < (s & 0xFF));
+            SET_H((GET_HL() & 0xF) < (t & 0xF));
+            SET_C((GET_HL() & 0xFF) < (t & 0xFF));
             registers.PC += 2;
             registers.cycles += 4;
         case 0xE9:    // JP (HL)
@@ -1665,7 +1668,7 @@ void cpuCycle(void) {
             registers.A ^= readByte(registers.PC);
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 2;
             registers.cycles += 2;
@@ -1707,7 +1710,7 @@ void cpuCycle(void) {
             registers.A |= readByte(registers.PC);
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.PC += 2;
             registers.cycles += 2;
@@ -1720,10 +1723,10 @@ void cpuCycle(void) {
             break;
         case 0xF8:    // LD HL, SP + n
             SET_HL(registers.SP + readByte(registers.PC+1));
-            set_N(0);
-      			set_Z(0);
-      			set_C(((registers.SP+i)&0xFF) < (registers.SP&0xFF)); // a carry will cause a wrap around = making new value smaller
-      			set_H(((registers.SP+i)&0x0F) < (registers.SP&0x0F)); // add the two, see if it becomes larger
+            SET_N(0);
+      			SET_Z(0);
+      			SET_C(((registers.SP+i)&0xFF) < (registers.SP&0xFF)); // a carry will cause a wrap around = making new value smaller
+      			SET_H(((registers.SP+i)&0x0F) < (registers.SP&0x0F)); // add the two, see if it becomes larger
             registers.PC += 2;
             registers.cycles += 3;
             break;
@@ -1762,13 +1765,14 @@ void cpuCycle(void) {
     }
 }
 
-void cbPrefix(inst) {
+void cbPrefix(unsigned char inst) {
+    int i;
+    unsigned char s;
     unsigned char instruction = inst;
 
     switch (instruction) {
         case 0x00:    // RLC B
-            unsigned char s = registers.B;
-            s = (s >> 7);
+            s = (registers.B >> 7);
             registers.B = (registers.B << 1) | s;
             SET_Z(!registers.B);
             SET_N(0);
@@ -1776,8 +1780,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x01:    // RLC C
-            unsigned char s = registers.C;
-            s = (s >> 7);
+            s = (registers.C >> 7);
             registers.C = (registers.C << 1) | s;
             SET_Z(!registers.C);
             SET_N(0);
@@ -1785,8 +1788,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x02:    // RLC D
-            unsigned char s = registers.D;
-            s = (s >> 7);
+            s = (registers.D >> 7);
             registers.D = (registers.D << 1) | s;
             SET_Z(!registers.D);
             SET_N(0);
@@ -1794,8 +1796,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x03:    // RLC E
-            unsigned char s = registers.E;
-            s = (s >> 7);
+            s = (registers.E >> 7);
             registers.E = (registers.E << 1) | s;
             SET_Z(!registers.E);
             SET_N(0);
@@ -1803,8 +1804,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x04:    // RLC H
-            unsigned char s = registers.H;
-            s = (s >> 7);
+            s = (registers.H >> 7);
             registers.H = (registers.H << 1) | s;
             SET_Z(!registers.H);
             SET_N(0);
@@ -1812,8 +1812,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x05:    // RLC L
-            unsigned char s = registers.L;
-            s = (s >> 7);
+            s = (registers.L >> 7);
             registers.L = (registers.L << 1) | s;
             SET_Z(!registers.L);
             SET_N(0);
@@ -1821,8 +1820,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x06:    // RLC HL
-            unsigned char s = readByte(GET_HL());
-            s = (s >> 7);
+            s = (readByte(GET_HL()) >> 7);
             SET_HL((GET_HL() << 1) | s);
             SET_Z(!GET_HL());
             SET_N(0);
@@ -1831,8 +1829,7 @@ void cbPrefix(inst) {
             registers.cycles += 2;
             break;
         case 0x07:    // RLC A
-            unsigned char s = registers.A;
-            s = (s >> 7);
+            s = (registers.A >> 7);
             registers.A = (registers.A << 1) | s;
             SET_Z(!registers.A);
             SET_N(0);
@@ -1840,8 +1837,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x08:    // RRC B
-            unsigned char s = registers.B;
-            s = (s & 0x1);
+            s = (registers.B & 0x1);
             registers.B = (registers.B >> 1) | (s << 7);
             SET_Z(!registers.B);
             SET_N(0);
@@ -1849,8 +1845,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x09:    // RRC C
-            unsigned char s = registers.C;
-            s = (s & 0x1);
+            s = (registers.C & 0x1);
             registers.C = (registers.C >> 1) | (s << 7);
             SET_Z(!registers.C);
             SET_N(0);
@@ -1858,8 +1853,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x0A:    // RRC D
-            unsigned char s = registers.D;
-            s = (s & 0x1);
+            s = (registers.D & 0x1);
             registers.D = (registers.D >> 1) | (s << 7);
             SET_Z(!registers.D);
             SET_N(0);
@@ -1867,8 +1861,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x0B:    // RRC E
-            unsigned char s = registers.E;
-            s = (s & 0x1);
+            s = (registers.E & 0x1);
             registers.E = (registers.E >> 1) | (s << 7);
             SET_Z(!registers.E);
             SET_N(0);
@@ -1876,8 +1869,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x0C:    // RRC H
-            unsigned char s = registers.H;
-            s = (s & 0x1);
+            s = (registers.H & 0x1);
             registers.H = (registers.H >> 1) | (s << 7);
             SET_Z(!registers.H);
             SET_N(0);
@@ -1885,8 +1877,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x0D:    // RRC L
-            unsigned char s = registers.L;
-            s = (s & 0x1);
+            s = (registers.L & 0x1);
             registers.L = (registers.L >> 1) | (s << 7);
             SET_Z(!registers.L);
             SET_N(0);
@@ -1894,8 +1885,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x0E:    // RRC (HL)
-            unsigned char s = readByte(GET_HL());
-            s = (s & 0x1);
+            s = (readByte(GET_HL()) & 0x1);
             SET_HL((GET_HL() >> 1) | (s << 7));
             SET_Z(!GET_HL());
             SET_N(0);
@@ -1904,8 +1894,7 @@ void cbPrefix(inst) {
             registers.cycles += 2;
             break;
         case 0x0F:    // RRC A
-            unsigned char s = registers.A;
-            s = (s & 0x1);
+            s = (registers.A & 0x1);
             registers.A = (registers.A >> 1) | (s << 7);
             SET_Z(!registers.A);
             SET_N(0);
@@ -1913,146 +1902,137 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x10:    // RL B
-            unsigned char t = registers.B;
+            s = registers.B;
             registers.B = (registers.B << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.B);
             SET_N(0);
             SET_H(0);
             break;
         case 0x11:    // RL C
-            unsigned char t = registers.C;
+            s = registers.C;
             registers.C = (registers.C << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.C);
             SET_N(0);
             SET_H(0);
             break;
         case 0x12:    // RL D
-            unsigned char t = registers.D;
+            s = registers.D;
             registers.D = (registers.D << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.D);
             SET_N(0);
             SET_H(0);
             break;
         case 0x13:    // RL E
-            unsigned char t = registers.E;
+            s = registers.E;
             registers.E = (registers.E << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.E);
             SET_N(0);
             SET_H(0);
             break;
         case 0x14:    // RL H
-            unsigned char t = registers.H;
+            s = registers.H;
             registers.H = (registers.H << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.H);
             SET_N(0);
             SET_H(0);
             break;
         case 0x15:    // RL L
-            unsigned char t = registers.L;
+            s = registers.L;
             registers.L = (registers.L << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.L);
             SET_N(0);
             SET_H(0);
             break;
         case 0x16:    // RL (HL)
-            unsigned char t = readByte(GET_HL());
+            s = readByte(GET_HL());
             SET_HL((GET_HL() << 1) | FLAG_C);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
             registers.cycles += 2;
             break;
         case 0x17:    // RL A
-            unsigned char t = registers.A;
+            s = registers.A;
             registers.A = (registers.A << 1) | FLAG_C;
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
             break;
         case 0x18:    // RR B
-            unsigned char t = registers.B;
-            t = (t & 0x1);
+            s = (registers.B & 0x1);
             registers.B = (registers.B >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.B);
             SET_N(0);
             SET_H(0);
             break;
         case 0x19:    // RR C
-            unsigned char t = registers.C;
-            t = (t & 0x1);
+            s = (registers.C & 0x1);
             registers.C = (registers.C >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.C);
             SET_N(0);
             SET_H(0);
             break;
         case 0x1A:    // RR D
-            unsigned char t = registers.D;
-            t = (t & 0x1);
+            s = (registers.D & 0x1);
             registers.D = (registers.D >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.D);
             SET_N(0);
             SET_H(0);
             break;
         case 0x1B:    // RR E
-            unsigned char t = registers.E;
-            t = (t & 0x1);
+            s = (registers.E & 0x1);
             registers.E = (registers.E >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.E);
             SET_N(0);
             SET_H(0);
             break;
         case 0x1C:    // RR H
-            unsigned char t = registers.H;
-            t = (t & 0x1);
+            s = (registers.H & 0x1);
             registers.H = (registers.H >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.H);
             SET_N(0);
             SET_H(0);
             break;
         case 0x1D:    // RR L
-            unsigned char t = registers.L;
-            t = (t & 0x1);
+            s = (registers.L & 0x1);
             registers.L = (registers.L >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.L);
             SET_N(0);
             SET_H(0);
             break;
         case 0x1E:    // RR (HL)
-            unsigned char t = readByte(GET_HL());
-            t = (t & 0x1);
+            s = (readByte(GET_HL()) & 0x1);
             SET_HL((GET_HL() >> 1) | (FLAG_C << 7));
-            SET_C(t);
+            SET_C(s);
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
             registers.cycles += 2;
             break;
         case 0x1F:    // RR A
-            unsigned char t = registers.A;
-            t = (t & 0x1);
+            s = (registers.A & 0x1);
             registers.A = (registers.A >> 1) | (FLAG_C << 7);
-            SET_C(t);
+            SET_C(s);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
             break;
         case 0x20:    // SLA B
-            unsigned char s = registers.B;
-            s = (s >> 7);
+            s = (registers.B >> 7);
             registers.B = (registers.B << 1);
             SET_Z(!registers.B);
             SET_N(0);
@@ -2060,8 +2040,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x21:    // SLA C
-            unsigned char s = registers.C;
-            s = (s >> 7);
+            s = (registers.C >> 7);
             registers.C = (registers.C << 1);
             SET_Z(!registers.C);
             SET_N(0);
@@ -2069,8 +2048,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x22:    // SLA D
-            unsigned char s = registers.D;
-            s = (s >> 7);
+            s = (registers.D >> 7);
             registers.D = (registers.D << 1);
             SET_Z(!registers.D);
             SET_N(0);
@@ -2078,8 +2056,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x23:    // SLA E
-            unsigned char s = registers.E;
-            s = (s >> 7);
+            s = (registers.E >> 7);
             registers.E = (registers.E << 1);
             SET_Z(!registers.E);
             SET_N(0);
@@ -2087,8 +2064,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x24:    // SLA H
-            unsigned char s = registers.H;
-            s = (s >> 7);
+            s = (registers.H >> 7);
             registers.H = (registers.H << 1);
             SET_Z(!registers.H);
             SET_N(0);
@@ -2096,8 +2072,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x25:    // SLA L
-            unsigned char s = registers.L;
-            s = (s >> 7);
+            s = (registers.L >> 7);
             registers.L = (registers.L << 1);
             SET_Z(!registers.L);
             SET_N(0);
@@ -2105,8 +2080,7 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x26:    // SLA HL
-            unsigned char s = readByte(GET_HL());
-            s = (s >> 7);
+            s = (readByte(GET_HL()) >> 7);
             SET_HL((GET_HL() << 1));
             SET_Z(!GET_HL());
             SET_N(0);
@@ -2115,8 +2089,7 @@ void cbPrefix(inst) {
             registers.cycles += 2;
             break;
         case 0x27:    // SLA A
-            unsigned char s = registers.A;
-            s = (s >> 7);
+            s = (registers.A >> 7);
             registers.A = (registers.A << 1);
             SET_Z(!registers.A);
             SET_N(0);
@@ -2124,66 +2097,66 @@ void cbPrefix(inst) {
             SET_C(s);
             break;
         case 0x28:    // SRA B
-            unsigned char t = registers.B;
+            s = registers.B;
             registers.B = (registers.B >> 1) | (registers.B & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.B);
             SET_N(0);
             SET_H(0);
             break;
         case 0x29:    // SRA C
-            unsigned char t = registers.C;
+            s = registers.C;
             registers.C = (registers.C >> 1) | (registers.C & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.C);
             SET_N(0);
             SET_H(0);
             break;
         case 0x2A:    // SRA D
-            unsigned char t = registers.D;
+            s = registers.D;
             registers.D = (registers.D >> 1) | (registers.D & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.D);
             SET_N(0);
             SET_H(0);
             break;
         case 0x2B:    // SRA E
-            unsigned char t = registers.E;
+            s = registers.E;
             registers.E = (registers.E >> 1) | (registers.E & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.E);
             SET_N(0);
             SET_H(0);
             break;
         case 0x2C:    // SRA H
-            unsigned char t = registers.H;
+            s = registers.H;
             registers.H = (registers.H >> 1) | (registers.H & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.H);
             SET_N(0);
             SET_H(0);
             break;
         case 0x2D:    // SRA L
-            unsigned char t = registers.L;
+            s = registers.L;
             registers.L = (registers.L >> 1) | (registers.L & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.L);
             SET_N(0);
             SET_H(0);
             break;
         case 0x2E:    // SRA (HL)
-            unsigned char t = readByte(GET_HL());
-            SET_HL((GET_HL() >> 1) | (GET_HL() & 0x80)));
-            SET_C(t >> 7);
+            s = readByte(GET_HL());
+            SET_HL((GET_HL() >> 1) | (GET_HL() & 0x80));
+            SET_C(s >> 7);
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
             registers.cycles += 2;
             break;
         case 0x2F:    // SRA A
-            unsigned char t = registers.A;
+            s = registers.A;
             registers.A = (registers.A >> 1) | (registers.A & 0x80);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
@@ -2192,49 +2165,49 @@ void cbPrefix(inst) {
             registers.B = (((registers.B & 0x0F) << 4) | ((registers.B & 0xF0) >> 4));
             SET_Z(!registers.B);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x31:    // SWAP C
             registers.C = (((registers.C & 0x0F) << 4) | ((registers.C & 0xF0) >> 4));
             SET_Z(!registers.C);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x32:    // SWAP D
             registers.D = (((registers.D & 0x0F) << 4) | ((registers.D & 0xF0) >> 4));
             SET_Z(!registers.D);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x33:    // SWAP E
             registers.E = (((registers.E & 0x0F) << 4) | ((registers.E & 0xF0) >> 4));
             SET_Z(!registers.E);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x34:    // SWAP H
             registers.H = (((registers.H & 0x0F) << 4) | ((registers.H & 0xF0) >> 4));
             SET_Z(!registers.H);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x35:    // SWAP L
             registers.L = (((registers.L & 0x0F) << 4) | ((registers.L & 0xF0) >> 4));
             SET_Z(!registers.L);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x36:    // SWAP HL
             writeByte(GET_HL(), (((GET_HL() & 0x0F) << 4) | ((GET_HL() & 0xF0) >> 4)));
             SET_Z(!GET_HL());
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             registers.cycles += 2;
             break;
@@ -2242,70 +2215,70 @@ void cbPrefix(inst) {
             registers.A = (((registers.A & 0x0F) << 4) | ((registers.A & 0xF0) >> 4));
             SET_Z(!registers.A);
             SET_N(0);
-            SET_H((0);
+            SET_H(0);
             SET_C(0);
             break;
         case 0x38:    // SRL B
-            unsigned char t = registers.B;
+            s = registers.B;
             registers.B = (registers.B >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.B);
             SET_N(0);
             SET_H(0);
             break;
         case 0x39:    // SRL C
-            unsigned char t = registers.C;
+            s = registers.C;
             registers.C = (registers.C >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.C);
             SET_N(0);
             SET_H(0);
             break;
         case 0x3A:    // SRL D
-            unsigned char t = registers.D;
+            s = registers.D;
             registers.D = (registers.D >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.D);
             SET_N(0);
             SET_H(0);
             break;
         case 0x3B:    // SRL E
-            unsigned char t = registers.E;
+            s = registers.E;
             registers.E = (registers.E >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.E);
             SET_N(0);
             SET_H(0);
             break;
         case 0x3C:    // SRL H
-            unsigned char t = registers.H;
+            s = registers.H;
             registers.H = (registers.H >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.H);
             SET_N(0);
             SET_H(0);
             break;
         case 0x3D:    // SRL L
-            unsigned char t = registers.L;
+            s = registers.L;
             registers.L = (registers.L >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.L);
             SET_N(0);
             SET_H(0);
             break;
         case 0x3E:    // SRL (HL)
-            unsigned char t = readByte(GET_HL());
+            s = readByte(GET_HL());
             SET_HL((GET_HL() >> 1));
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
             registers.cycles += 2;
             break;
         case 0x3F:    // SRL A
-            unsigned char t = registers.A;
+            s = registers.A;
             registers.A = (registers.A >> 1);
-            SET_C(t >> 7);
+            SET_C(s >> 7);
             SET_Z(!registers.A);
             SET_N(0);
             SET_H(0);
@@ -2658,7 +2631,7 @@ void cbPrefix(inst) {
             break;
         case 0x86:    // RES (HL) 0
             SET_HL(GET_HL() & 0xFE);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0x87:    // RES A 0
             registers.A &= 0xFE;
@@ -2683,7 +2656,7 @@ void cbPrefix(inst) {
             break;
         case 0x8E:    // RES (HL) 1
             SET_HL(GET_HL() & 0xFD);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0x8F:    // RES A 1
             registers.A &= 0xFD;
@@ -2708,7 +2681,7 @@ void cbPrefix(inst) {
             break;
         case 0x96:    // RES (HL) 2
             SET_HL(GET_HL() & 0xFB);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0x97:    // RES A 2
             registers.A &= 0xFB;
@@ -2733,7 +2706,7 @@ void cbPrefix(inst) {
             break;
         case 0x9E:    // RES (HL) 3
             SET_HL(GET_HL() & 0xF7);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0x9F:    // RES A 3
             registers.A &= 0xF7;
@@ -2758,7 +2731,7 @@ void cbPrefix(inst) {
             break;
         case 0xA6:    // RES (HL) 4
             SET_HL(GET_HL() & 0xEF);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xA7:    // RES A 4
             registers.A &= 0xEF;
@@ -2783,7 +2756,7 @@ void cbPrefix(inst) {
             break;
         case 0xAE:    // RES (HL) 5
             SET_HL(GET_HL() & 0xDF);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xAF:    // RES A 5
             registers.A &= 0xDF;
@@ -2808,7 +2781,7 @@ void cbPrefix(inst) {
             break;
         case 0xB6:    // RES (HL) 6
             SET_HL(GET_HL() & 0xBF);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xB7:    // RES A 6
             registers.A &= 0x7F;
@@ -2833,7 +2806,7 @@ void cbPrefix(inst) {
             break;
         case 0xBE:    // RES (HL) 7
             SET_HL(GET_HL() & 0x7F);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xBF:    // RES A 7
             registers.A &= 0x7F;
@@ -2858,7 +2831,7 @@ void cbPrefix(inst) {
             break;
         case 0xC6:    // SET (HL) 0
             SET_HL(GET_HL() | 0x01);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xC7:    // SET A 0
             registers.A |= 0x01;
@@ -2883,7 +2856,7 @@ void cbPrefix(inst) {
             break;
         case 0xCE:    // SET (HL) 1
             SET_HL(GET_HL() | 0x02);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xCF:    // SET A 1
             registers.A |= 0x02;
@@ -2908,7 +2881,7 @@ void cbPrefix(inst) {
             break;
         case 0xD6:    // SET (HL) 2
             SET_HL(GET_HL() | 0x04);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xD7:    // SET A 2
             registers.A |= 0x04;
@@ -2933,7 +2906,7 @@ void cbPrefix(inst) {
             break;
         case 0xDE:    // SET (HL) 3
             SET_HL(GET_HL() | 0x08);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xDF:    // SET A 3
             registers.A |= 0x08;
@@ -2958,7 +2931,7 @@ void cbPrefix(inst) {
             break;
         case 0xE6:    // SET (HL) 4
             SET_HL(GET_HL() | 0x10);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xE7:    // SET A 4
             registers.A |= 0x10;
@@ -2983,7 +2956,7 @@ void cbPrefix(inst) {
             break;
         case 0xEE:    // SET (HL) 5
             SET_HL(GET_HL() | 0x20);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xEF:    // SET A 5
             registers.A |= 0x20;
@@ -3008,7 +2981,7 @@ void cbPrefix(inst) {
             break;
         case 0xF6:    // SET (HL) 6
             SET_HL(GET_HL() | 0x40);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xF7:    // SET A 6
             registers.A |= 0x40;
@@ -3033,7 +3006,7 @@ void cbPrefix(inst) {
             break;
         case 0xFE:    // SET (HL) 7
             SET_HL(GET_HL() | 0x80);
-            registers.cyles += 2;
+            registers.cycles += 2;
             break;
         case 0xFF:    // SET A 7
             registers.A |= 0x80;

@@ -40,4 +40,4 @@ struct registers {
 void cpu_interrupt(unsigned short address);
 void reset(void);
 void cpuCycle(void);
-void cbPrefix(void);
+void cbPrefix(unsigned char inst);
