@@ -11,27 +11,27 @@ void interruptCycle(void) {
 
         if (inter & VBLANK) {
             interrupt.flags &= ~VBLANK; // turn off the flag
-            cpu_interrupt(0x40);
+            cpuInterrupt(0x40);
         }
 
         if (inter & LCDSTAT) {
             interrupt.flags &= ~LCDSTAT;
-            cpu_interrupt(0x48);
+            cpuInterrupt(0x48);
         }
 
         if (inter & TIMER) {
             interrupt.flags &= ~TIMER;
-            cpu_interrupt(0x50);
+            cpuInterrupt(0x50);
         }
 
         if (inter & SERIAL) {
             interrupt.flags &= ~SERIAL;
-            cpu_interrupt(0x58);
+            cpuInterrupt(0x58);
         }
 
         if (inter & JOYPAD) {
             interrupt.flags &= ~JOYPAD;
-            cpu_interrupt(0x60);
+            cpuInterrupt(0x60);
         }
     }
 }

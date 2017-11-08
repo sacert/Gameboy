@@ -7,7 +7,7 @@
 struct registers registers;
 static int halted = 0;
 
-void cpu_interrupt(unsigned short address) {
+void cpuInterrupt(unsigned short address) {
     interrupt.master = 0;
     registers.PC -= 2;
     writeShort(registers.SP, registers.PC);
@@ -15,7 +15,7 @@ void cpu_interrupt(unsigned short address) {
     interrupt.enable = 0;
 }
 
-void reset(void) {
+void cpuInit(void) {
 
     memset(sram, 0, sizeof(sram));
   	memset(io, 0, sizeof(io));
@@ -33,7 +33,7 @@ void reset(void) {
   	SET_DE(0x00D8);
   	SET_HL(0x014D);
     registers.SP = 0xFFFE;
-    registers.PC = 0x100;
+    registers.PC = 0x0100;
     registers.cycles = 0;
 }
 
@@ -54,6 +54,7 @@ void cpuCycle(void) {
         case 0x00:    // NOP
             registers.PC += 1;
             registers.cycles += 1;
+            break;
         case 0x01:    // LD BC,nn
             SET_BC(readShort(registers.PC+1));
             registers.PC += 3;
@@ -219,6 +220,7 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
+            break;
         case 0x1A:    // LD A,(DE)
             registers.A = readByte(GET_DE());
             registers.PC += 1;
@@ -324,6 +326,7 @@ void cpuCycle(void) {
             SET_C((registers.A & 0xFF) < (u & 0xFF));
             registers.PC += 1;
             registers.cycles += 1;
+            break;
         case 0x28:    // JP Z
             if (FLAG_Z == 1) {
               registers.PC += (signed char)readByte(registers.PC+1);
@@ -340,6 +343,7 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
+            break;
         case 0x2A:    // LDI A,(HL)
             registers.A = readByte(GET_HL());
             SET_HL(GET_HL()+1);
@@ -449,6 +453,7 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFFFF) < (t & 0xFFFF));
             registers.PC += 1;
             registers.cycles += 2;
+            break;
         case 0x3A:    // LDD A, (HL)
             registers.A = readByte(GET_HL());
             SET_HL(GET_HL() - 1);
@@ -1781,12 +1786,14 @@ void cpuCycle(void) {
             break;
     }
 
-    printf("Register A: %u, \t Register F: %u\n", registers.A, registers.F);
-    printf("Register B: %u, \t Register C: %u\n", registers.B, registers.C);
-    printf("Register D: %u, \t Register E: %u\n", registers.D, registers.E);
-    printf("Register H: %u, \t Register L: %u\n", registers.H, registers.L);
+    printf("Instruction: %02X\n", (int)instruction);
+    printf("Register A: %02X, \t\t Register F: %02X\n", (int)registers.A, (int)registers.F);
+    printf("Register B: %02X, \t\t Register C: %02X\n", (int)registers.B, (int)registers.C);
+    printf("Register D: %02X, \t\t Register E: %02X\n", (int)registers.D, (int)registers.E);
+    printf("Register H: %02X, \t\t Register L: %02X\n", (int)registers.H, (int)registers.L);
     printf("Register SP: %hu\n", registers.SP);
     printf("Register PC: %hu\n", registers.PC);
+    while(getchar()!='\n'); // option TWO to clean stdin
 
 }
 
