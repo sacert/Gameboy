@@ -1,7 +1,8 @@
-#import "cpu.h"
-#import "MMU.h"
-#import "interrupt.h"
 #include <stdio.h>
+#include <string.h>
+#include "cpu.h"
+#include "MMU.h"
+#include "interrupt.h"
 
 struct registers registers;
 static int halted = 0;
@@ -16,6 +17,22 @@ void cpu_interrupt(unsigned short address) {
 
 void reset(void) {
 
+    memset(sram, 0, sizeof(sram));
+  	memset(io, 0, sizeof(io));
+  	memset(vram, 0, sizeof(vram));
+  	memset(oam, 0, sizeof(oam));
+  	memset(wram, 0, sizeof(wram));
+  	memset(hram, 0, sizeof(hram));
+
+    interrupt.master = 1;
+    interrupt.enable = 0;
+    interrupt.flags = 0;
+
+    SET_AF(0x01B0);
+  	SET_BC(0x0013);
+  	SET_DE(0x00D8);
+  	SET_HL(0x014D);
+    registers.SP = 0xFFFE;
     registers.PC = 0x100;
     registers.cycles = 0;
 }
@@ -1763,6 +1780,7 @@ void cpuCycle(void) {
             printf("Undefined instruction.");
             break;
     }
+
 }
 
 void cbPrefix(unsigned char inst) {
