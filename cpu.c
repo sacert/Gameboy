@@ -1781,6 +1781,13 @@ void cpuCycle(void) {
             break;
     }
 
+    printf("Register A: %u, \t Register F: %u\n", registers.A, registers.F);
+    printf("Register B: %u, \t Register C: %u\n", registers.B, registers.C);
+    printf("Register D: %u, \t Register E: %u\n", registers.D, registers.E);
+    printf("Register H: %u, \t Register L: %u\n", registers.H, registers.L);
+    printf("Register SP: %hu\n", registers.SP);
+    printf("Register PC: %hu\n", registers.PC);
+
 }
 
 void cbPrefix(unsigned char inst) {
