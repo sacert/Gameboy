@@ -481,6 +481,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
+        case 0x3E:    // LD A,n
+            registers.A = readByte(registers.PC+1);
+            registers.PC += 2;
+            registers.cycles += 2;
+            break;
         case 0x3F:    // CCF
             SET_N(0);
             SET_H(0);
