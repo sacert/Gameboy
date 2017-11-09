@@ -8,10 +8,10 @@
 #define GET_DE() ((registers.D << 8) | registers.E)
 #define GET_HL() ((registers.H << 8) | registers.L)
 
-#define SET_Z(x) ((registers.F & 0x7F) | (x << 7))
-#define SET_N(x) ((registers.F & 0xBF) | (x << 6))
-#define SET_H(x) ((registers.F & 0xDF) | (x << 5))
-#define SET_C(x) ((registers.F & 0xEF) | (x << 4))
+#define SET_Z(x) registers.F = ((registers.F & 0x7F) | (x << 7))
+#define SET_N(x) registers.F = ((registers.F & 0xBF) | (x << 6))
+#define SET_H(x) registers.F = ((registers.F & 0xDF) | (x << 5))
+#define SET_C(x) registers.F = ((registers.F & 0xEF) | (x << 4))
 
 #define FLAG_Z ((registers.F >> 7) & 0x1)
 #define FLAG_N ((registers.F >> 6) & 0x1)

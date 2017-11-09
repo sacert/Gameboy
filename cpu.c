@@ -1682,6 +1682,7 @@ void cpuCycle(void) {
             SET_C((GET_HL() & 0xFF) < (t & 0xFF));
             registers.PC += 2;
             registers.cycles += 4;
+            break;
         case 0xE9:    // JP (HL)
             registers.PC = GET_HL();
             registers.cycles += 1;
@@ -1776,7 +1777,7 @@ void cpuCycle(void) {
             SET_Z(registers.A == readByte(registers.PC));
             SET_N(1);
             SET_H(((registers.A-readByte(registers.PC)) & 0xF) > (registers.A & 0xF));
-            SET_C(registers.A < readByte(registers.PC));
+            SET_C((registers.A < readByte(registers.PC)));
             registers.PC += 2;
             registers.cycles += 2;
             break;
@@ -1792,12 +1793,13 @@ void cpuCycle(void) {
     }
 
     printf("Instruction: %02X\n", (int)instruction);
-    printf("Register A: %02X, \t\t Register F: %02X\n", (int)registers.A, (int)registers.F);
-    printf("Register B: %02X, \t\t Register C: %02X\n", (int)registers.B, (int)registers.C);
-    printf("Register D: %02X, \t\t Register E: %02X\n", (int)registers.D, (int)registers.E);
-    printf("Register H: %02X, \t\t Register L: %02X\n", (int)registers.H, (int)registers.L);
-    printf("Register SP: %hu\n", registers.SP);
-    printf("Register PC: %hu\n", registers.PC);
+    printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
+    printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
+    printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
+    printf("Register HL: %02X%02X\n", (int)registers.H, (int)registers.L);
+    printf("Register SP: %02X\n", (int)registers.SP);
+    printf("Register PC: %02X\n", (int)registers.PC);
+    printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
     while(getchar()!='\n'); // option TWO to clean stdin
 
 }
