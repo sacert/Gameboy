@@ -2,6 +2,7 @@
 #include "rom.h"
 #include "MMU.h"
 #include "interrupt.h"
+#include "lcd.h"
 
 unsigned char readByte(unsigned short address) {
 
@@ -21,8 +22,18 @@ unsigned char readByte(unsigned short address) {
         return interrupt.flags;
     else if (address == 0xFFFF)
         return interrupt.enable;
+    else if (address == 0xFF40)
+        getLCDC();
+    else if (address == 0xFF41)
+        getLCDS();
+    else if (address == 0xFF42)
+        getScrollY();
+    else if (address == 0xFF43)
+        getScrollX();
+    else if (address == 0xFF44)
+        getLine();
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
-    		return io[address - 0xff00];
+    	return io[address - 0xff00];
     else if (0xFF80 <= address && address <= 0xFFFE)
         return hram[address - 0xFF80];
 
@@ -50,6 +61,26 @@ void writeByte(unsigned short address, unsigned char value) {
         interrupt.flags = address;
     else if (address == 0xFFFF)
         interrupt.enable = address;
+    else if (address == 0xFF40)
+        setLCDC(address);
+    else if (address == 0xFF41)
+        setLCDS(address);
+    else if (address == 0xFF42)
+        setScrollY(address);
+    else if (address == 0xFF43)
+        setScrollX(address);
+    else if (address == 0xFF45)
+        setLyCompare(address);
+    else if (address == 0xFF47)
+        setBGPalette(address);
+    else if (address == 0xFF48)
+        setSpritePalette1(address);
+    else if (address == 0xFF49)
+        setSpritePalette2(address);
+    else if (address == 0xFF4A)
+        setWindowY(address);
+    else if (address == 0xFF4B)
+        setWindowX(address);
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
     		io[address - 0xff00] = value;
     else if (0xFF80 <= address && address <= 0xFFFE)
