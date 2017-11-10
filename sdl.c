@@ -17,7 +17,7 @@ void sdlSetFrame(void) {
 
     if (display.frames % 100 == 0) { // try it out with 100 frames, might give a good enough estiamte of fps
         gettimeofday(&t2, NULL);
-        printf("FPS: %d\n", display.frames/(t2.tv_sec - t1.tv_sec));
+        printf("FPS: %ld\n", display.frames/(t2.tv_sec - t1.tv_sec));
     }
 
     /* may need the following */
@@ -25,9 +25,9 @@ void sdlSetFrame(void) {
     // display.texture = SDL_CreateTextureFromSurface(display.renderer, display.surface);
     // SDL_FreeSurface(display.surface);
     // SDL_RenderClear(display.renderer);
-    // SDL_RenderCopy(rdisplay.enderer, display.texture, NULL, NULL);
-    SDL_RenderPresent(renderer); // push 'behind the scenes' into display
-    frames++;
+    // SDL_RenderCopy(display.renderer, display.texture, NULL, NULL);
+    SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
+    display.frames++;
 }
 
 int sdlUpdate(void) {
@@ -36,60 +36,60 @@ int sdlUpdate(void) {
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_KEYDOWN:
-                swtich(event.key.keysym.sym) {
+                switch(event.key.keysym.sym) {
                     case SDLK_LEFT:
-                        button.left = 1;
+                        buttons.left = 1;
                         break;
                     case SDLK_RIGHT:
-                        button.right = 1;
+                        buttons.right = 1;
                         break;
                     case SDLK_UP:
-                        button.up = 1;
+                        buttons.up = 1;
                         break;
                     case SDLK_DOWN:
-                        button.down = 1;
+                        buttons.down = 1;
                         break;
                     case SDLK_z:
-                        button.a = 1;
+                        buttons.a = 1;
                         break;
                     case SDLK_x:
-                        button.b = 1;
+                        buttons.b = 1;
                         break;
                     case SDLK_a:
-                        button.start = 1;
+                        buttons.start = 1;
                         break;
                     case SDLK_s:
-                        button.select = 1;
+                        buttons.select = 1;
                         break;
                     default:
                         break;
                 }
                 break;
             case SDL_KEYUP:
-                swtich(event.key.keysym.sym) {
+                switch(event.key.keysym.sym) {
                     case SDLK_LEFT:
-                        button.left = 0;
+                        buttons.left = 0;
                         break;
                     case SDLK_RIGHT:
-                        button.right = 0;
+                        buttons.right = 0;
                         break;
                     case SDLK_UP:
-                        button.up = 0;
+                        buttons.up = 0;
                         break;
                     case SDLK_DOWN:
-                        button.down = 0;
+                        buttons.down = 0;
                         break;
                     case SDLK_z:
-                        button.a = 0;
+                        buttons.a = 0;
                         break;
                     case SDLK_x:
-                        button.b = 0;
+                        buttons.b = 0;
                         break;
                     case SDLK_a:
-                        button.start = 0;
+                        buttons.start = 0;
                         break;
                     case SDLK_s:
-                        button.select = 0;
+                        buttons.select = 0;
                         break;
                     default:
                         break;
