@@ -20,6 +20,12 @@ void sdlSetFrame(void) {
         printf("FPS: %d\n", display.frames/(t2.tv_sec - t1.tv_sec));
     }
 
+    /* may need the following */
+    // display.surface = get it up
+    // display.texture = SDL_CreateTextureFromSurface(display.renderer, display.surface);
+    // SDL_FreeSurface(display.surface);
+    // SDL_RenderClear(display.renderer);
+    // SDL_RenderCopy(rdisplay.enderer, display.texture, NULL, NULL);
     SDL_RenderPresent(renderer); // push 'behind the scenes' into display
     frames++;
 }
@@ -94,6 +100,10 @@ int sdlUpdate(void) {
         }
     }
     return 0;
+}
+
+unsigned int *sdlFrameBuffer(void) {
+    return display.surface->pixels;
 }
 
 void sdlQuit(void) {

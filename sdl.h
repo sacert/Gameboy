@@ -19,9 +19,12 @@ struct buttons {
 struct display {
     SDL_Window *screen;
     SDL_Renderer *renderer;
+    SDL_Texture *texture;
+    SDL_Surface *surface;
     unsigned int frames;
 } display;
 
 void sdlInit(void);
 void sdlSetFrame(void);
 int sdlUpdate(void);
+unsigned int *sdlFrameBuffer(void);
