@@ -24,3 +24,4 @@ struct display {
 
 void sdlInit(void);
 void sdlSetFrame(void);
+int sdlUpdate(void);
