@@ -10,3 +10,4 @@ unsigned char readByte(unsigned short address);
 unsigned short readShort(unsigned short address);
 void writeByte(unsigned short address, unsigned char value);
 void writeShort(unsigned short address, unsigned short value);
+void memInit(void);
