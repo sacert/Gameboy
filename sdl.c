@@ -24,6 +24,78 @@ void sdlSetFrame(void) {
     frames++;
 }
 
+int sdlUpdate(void) {
+    SDL_Event event;
+
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_KEYDOWN:
+                swtich(event.key.keysym.sym) {
+                    case SDLK_LEFT:
+                        button.left = 1;
+                        break;
+                    case SDLK_RIGHT:
+                        button.right = 1;
+                        break;
+                    case SDLK_UP:
+                        button.up = 1;
+                        break;
+                    case SDLK_DOWN:
+                        button.down = 1;
+                        break;
+                    case SDLK_z:
+                        button.a = 1;
+                        break;
+                    case SDLK_x:
+                        button.b = 1;
+                        break;
+                    case SDLK_a:
+                        button.start = 1;
+                        break;
+                    case SDLK_s:
+                        button.select = 1;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SDL_KEYUP:
+                swtich(event.key.keysym.sym) {
+                    case SDLK_LEFT:
+                        button.left = 0;
+                        break;
+                    case SDLK_RIGHT:
+                        button.right = 0;
+                        break;
+                    case SDLK_UP:
+                        button.up = 0;
+                        break;
+                    case SDLK_DOWN:
+                        button.down = 0;
+                        break;
+                    case SDLK_z:
+                        button.a = 0;
+                        break;
+                    case SDLK_x:
+                        button.b = 0;
+                        break;
+                    case SDLK_a:
+                        button.start = 0;
+                        break;
+                    case SDLK_s:
+                        button.select = 0;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            default:
+                break;
+        }
+    }
+    return 0;
+}
+
 void sdlQuit(void) {
     SDL_Quit();
 }
