@@ -84,9 +84,10 @@ void cpuCycle(void) {
             break;
         case 0x05:    // DEC B
             registers.B -= 1;
-            SET_Z(registers.B);
+            printf("%u", registers.B);
+            SET_Z(!registers.B);
             SET_N(1);
-            SET_H((registers.B & 0xF) > ((registers.B-1) & 0xF));
+            SET_H((registers.B & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -193,7 +194,7 @@ void cpuCycle(void) {
             registers.D -= 1;
             SET_Z(registers.D);
             SET_N(1);
-            SET_H((registers.D & 0xF) > ((registers.D-1) & 0xF));
+            SET_H((registers.D & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -247,7 +248,7 @@ void cpuCycle(void) {
             registers.E -= 1;
             SET_Z(registers.E);
             SET_N(1);
-            SET_H((registers.E & 0xF) > ((registers.E-1) & 0xF));
+            SET_H((registers.E & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -302,7 +303,7 @@ void cpuCycle(void) {
             registers.H -= 1;
             SET_Z(registers.H);
             SET_N(1);
-            SET_H((registers.H & 0xF) > ((registers.H-1) & 0xF));
+            SET_H((registers.H & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -378,7 +379,7 @@ void cpuCycle(void) {
             registers.L -= 1;
             SET_Z(registers.L);
             SET_N(1);
-            SET_H((registers.L & 0xF) > ((registers.L-1) & 0xF));
+            SET_H((registers.L & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -425,7 +426,7 @@ void cpuCycle(void) {
             writeByte(GET_HL(), s);
             SET_Z(s);
             SET_N(1);
-            SET_H((s & 0xF) > ((s-1) & 0xF));
+            SET_H((s & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -481,7 +482,7 @@ void cpuCycle(void) {
             registers.A -= 1;
             SET_Z(registers.A);
             SET_N(1);
-            SET_H((registers.A & 0xF) > ((registers.A-1) & 0xF));
+            SET_H((registers.A & 0xF) = 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -1796,6 +1797,7 @@ void cpuCycle(void) {
             break;
     }
 
+    
     printf("Instruction: %02X\n", (int)instruction);
     printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
     printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
@@ -1805,7 +1807,7 @@ void cpuCycle(void) {
     printf("Register PC: %02X\n", (int)registers.PC);
     printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
     while(getchar()!='\n'); // option TWO to clean stdin
-
+    
 }
 
 void cbPrefix(unsigned char inst) {

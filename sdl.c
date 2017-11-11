@@ -3,10 +3,15 @@
 struct timeval t1, t2;
 struct buttons buttons;
 struct display display;
+unsigned int frames;
+
+SDL_Surface *test;
 
 void sdlInit(void) {
     SDL_Init(SDL_INIT_VIDEO);
     display.screen = SDL_CreateWindow("Game Boy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN); 
+    test = SDL_GetWindowSurface(display.screen);
+    frames = 0;
 }
 
 void sdlSetFrame(void) {
@@ -14,10 +19,10 @@ void sdlSetFrame(void) {
     if (display.frames == 0) {
         gettimeofday(&t1, NULL);
     }
-
+    frames++;
     if (display.frames % 100 == 0) { // try it out with 100 frames, might give a good enough estiamte of fps
         gettimeofday(&t2, NULL);
-        printf("FPS: %ld\n", display.frames/(t2.tv_sec - t1.tv_sec));
+        //printf("FPS: %ld\n", frames/(t2.tv_sec - t1.tv_sec));
     }
 
     /* may need the following */
@@ -26,8 +31,10 @@ void sdlSetFrame(void) {
     // SDL_FreeSurface(display.surface);
     // SDL_RenderClear(display.renderer);
     // SDL_RenderCopy(display.renderer, display.texture, NULL, NULL);
-    SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
+    // SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
+    SDL_UpdateWindowSurface(display.screen);
     display.frames++;
+    frames++;
 }
 
 int sdlUpdate(void) {
@@ -103,7 +110,7 @@ int sdlUpdate(void) {
 }
 
 unsigned int *sdlFrameBuffer(void) {
-    return display.surface->pixels;
+    return test->pixels;
 }
 
 void sdlQuit(void) {

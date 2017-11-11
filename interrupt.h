@@ -5,9 +5,9 @@
 #define JOYPAD    (1 << 4)
 
 struct interrupt {
-	 unsigned char master;
-   unsigned char enable;
-   unsigned char flags;
+    unsigned char master;
+    unsigned char enable;
+    unsigned char flags;
 } extern interrupt;
 
 void interruptCycle(void);

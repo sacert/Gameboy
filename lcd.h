@@ -1,7 +1,3 @@
-struct colour {
-    unsigned char r, g, b;
-} colour;
-
 struct LCD {
     int windowX;
     int windowY;
@@ -34,6 +30,13 @@ struct LCDS {
     int modeFlag;
 } LCDS;
 
+struct sprite {
+    int y;
+    int x;
+    int patternNum;
+    int flags;
+} sprite;
+
 void setLCDC(unsigned char address);
 void setLCDS(unsigned char address);
 void setBGPalette(unsigned char address);
@@ -54,3 +57,6 @@ unsigned char getWindowY(void);
 int getLine(void);
 
 int lcdCycle(void);
+void renderLine(int line);
+void draw_sprites(unsigned int *b, int line, int nsprites, struct sprite *s);
+void draw_stuff(void);
