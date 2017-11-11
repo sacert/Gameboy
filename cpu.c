@@ -84,10 +84,9 @@ void cpuCycle(void) {
             break;
         case 0x05:    // DEC B
             registers.B -= 1;
-            printf("%u", registers.B);
             SET_Z(!registers.B);
             SET_N(1);
-            SET_H((registers.B & 0xF) == 0xF));
+            SET_H(((registers.B & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -192,9 +191,9 @@ void cpuCycle(void) {
             break;
         case 0x15:    // DEC D
             registers.D -= 1;
-            SET_Z(registers.D);
+            SET_Z(!registers.D);
             SET_N(1);
-            SET_H((registers.D & 0xF) = 0xF));
+            SET_H(((registers.D & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -246,9 +245,9 @@ void cpuCycle(void) {
             break;
         case 0x1D:    // DEC E
             registers.E -= 1;
-            SET_Z(registers.E);
+            SET_Z(!registers.E);
             SET_N(1);
-            SET_H((registers.E & 0xF) = 0xF));
+            SET_H(((registers.E & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -269,10 +268,11 @@ void cpuCycle(void) {
             break;
         case 0x20:    // JP NZ
             if (FLAG_Z == 0) {
-              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.PC += (signed char)readByte(registers.PC+1) + 2;
               registers.cycles += 3;
             } else {
               registers.PC += 2;
+              registers.cycles += 2;
             }
             break;
         case 0x21:    // LD HL,nn
@@ -301,9 +301,9 @@ void cpuCycle(void) {
             break;
         case 0x25:    // DEC H
             registers.H -= 1;
-            SET_Z(registers.H);
+            SET_Z(!registers.H);
             SET_N(1);
-            SET_H((registers.H & 0xF) = 0xF));
+            SET_H(((registers.H & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -334,10 +334,11 @@ void cpuCycle(void) {
             break;
         case 0x28:    // JP Z
             if (FLAG_Z == 1) {
-              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.PC += (signed char)readByte(registers.PC+1) + 2;
               registers.cycles += 3;
             } else {
               registers.PC += 2;
+              registers.cycles += 2;
             }
             break;
         case 0x29:    // ADD HL,HL
@@ -377,9 +378,9 @@ void cpuCycle(void) {
             break;
         case 0x2D:    // DEC L
             registers.L -= 1;
-            SET_Z(registers.L);
+            SET_Z(!registers.L);
             SET_N(1);
-            SET_H((registers.L & 0xF) = 0xF));
+            SET_H(((registers.L & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -390,10 +391,11 @@ void cpuCycle(void) {
             break;
         case 0x30:    // JP NC
             if (FLAG_C == 0) {
-              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.PC += (signed char)readByte(registers.PC+1) + 2;
               registers.cycles += 3;
             } else {
               registers.PC += 2;
+              registers.cycles += 2;
             }
             break;
         case 0x31:    // LD SP,nn
@@ -424,9 +426,9 @@ void cpuCycle(void) {
         case 0x35:    // DEC (HL)
             s = readByte(GET_HL()) - 1;
             writeByte(GET_HL(), s);
-            SET_Z(s);
+            SET_Z(!s);
             SET_N(1);
-            SET_H((s & 0xF) = 0xF));
+            SET_H(((s & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -444,10 +446,11 @@ void cpuCycle(void) {
             break;
         case 0x38:    // JP C
             if (FLAG_C == 1) {
-              registers.PC += (signed char)readByte(registers.PC+1);
+              registers.PC += (signed char)readByte(registers.PC+1) + 2;
               registers.cycles += 3;
             } else {
               registers.PC += 2;
+              registers.cycles += 2;
             }
             break;
         case 0x39:    // ADD HL,SP
@@ -480,9 +483,9 @@ void cpuCycle(void) {
             break;
         case 0x3D:    // DEC A
             registers.A -= 1;
-            SET_Z(registers.A);
+            SET_Z(!registers.A);
             SET_N(1);
-            SET_H((registers.A & 0xF) = 0xF));
+            SET_H(((registers.A & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
