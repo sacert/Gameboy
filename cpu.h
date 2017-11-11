@@ -39,5 +39,6 @@ struct registers {
 
 void cpuInterrupt(unsigned short address);
 void cpuInit(void);
+unsigned int getCycles(void);
 void cpuCycle(void);
 void cbPrefix(unsigned char inst);

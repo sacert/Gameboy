@@ -8,6 +8,7 @@ struct LCD {
     int scrollX;
     int scrollY;
     int line;
+    int frame;
     int lyCompare;
 } LCD;
 
@@ -51,3 +52,5 @@ unsigned char getScrollY(void);
 unsigned char getWindowX(void);
 unsigned char getWindowY(void);
 int getLine(void);
+
+int lcdCycle(void);

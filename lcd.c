@@ -1,4 +1,6 @@
 #include "lcd.h"
+#include "cpu.h"
+#include "sdl.h"
 
 struct colour palette[4] = {
     {255, 255, 255},
@@ -93,5 +95,44 @@ int getLine(void) {
 }
 
 void setLyCompare(unsigned char address) {
-    LCD.lyCompare = address;
+    LCD.lyCompare = (LCD.line == address);
+}
+
+int lcdCycle(void) {
+    
+    int cycles = getCycles();
+    int prevLine;
+    
+    if (sdlUpdate())
+        return 0;
+    
+    LCD.frame = cycles % (70224/4); // 70224 clks per screen
+    LCD.line = LCD.frame / (456/4); // 465 clks per line
+
+    if (LCD.frame < 204/4)
+        LCDS.modeFlag = 2;  // OAM
+    else if (LCD.frame < 284/4)
+        LCDS.modeFlag = 3;  // VRA
+    else if (LCD.frame < 456/4)
+        LCDS.modeFlag = 0;  // HBlank
+    
+    // Done all lines
+    if (LCD.line >= 144)
+        LCDS.modeFlag = 1;  // VBlank
+
+    if (LCD.line != prevLine && LCD.line < 144) {
+        // render the line
+    }
+
+    if (LCDS.lyInterrupt && LCD.lyCompare) {
+        // interrupt
+    }
+
+    if (LCD.line == 144) {
+        // draw the entire frame
+    }
+    
+    prevLine = LCD.line;
+    
+    return 1;
 }

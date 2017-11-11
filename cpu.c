@@ -37,6 +37,10 @@ void cpuInit(void) {
     registers.cycles = 0;
 }
 
+unsigned int getCycles(void) {
+    return registers.cycles;
+}
+
 void cpuCycle(void) {
 
     if (halted) {
