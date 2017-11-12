@@ -1647,7 +1647,7 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         case 0xE0:    // LD ($FF00+n), A
-            writeByte(0xFF00 + readByte(registers.PC), registers.A);
+            writeByte(0xFF00 + readByte(registers.PC+1), registers.A);
             registers.PC += 2;
             registers.cycles += 3;
             break;
@@ -1800,9 +1800,19 @@ void cpuCycle(void) {
             printf("Undefined instruction.");
             break;
     }
-   
-   if (interrupt.enable) {
-       printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
+
+
+   if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20) {
+       printf("Instruction: %02X\n", (int)instruction);
+        printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
+        printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
+        printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
+        printf("Register HL: %02X%02X\n", (int)registers.H, (int)registers.L);
+        printf("Register SP: %02X\n", (int)registers.SP);
+        printf("Register PC: %02X\n", (int)registers.PC);
+        printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t\n", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
+        printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
+       while(getchar()!='\n'); // option TWO to clean stdin
    }
    //printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
    

@@ -45,7 +45,7 @@ unsigned short readShort(unsigned short address) {
 }
 
 void writeByte(unsigned short address, unsigned char value) {
-    
+
     // cant write to ROM
     if (0x8000 <= address && address <= 0x9FFF)
         vram[address - 0x8000] = value;
@@ -58,9 +58,9 @@ void writeByte(unsigned short address, unsigned char value) {
     else if (0xFE00 <= address && address <= 0xFEFF)
         oam[address - 0xFE00] = value;
     else if (address == 0xFF0F)
-        interrupt.flags = address;
+        interrupt.flags = value;
     else if (address == 0xFFFF) 
-        interrupt.enable = address;
+        interrupt.enable = value;
     else if (address == 0xFF40)
         setLCDC(address);
     else if (address == 0xFF41)
