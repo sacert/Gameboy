@@ -6,6 +6,7 @@
 
 struct registers registers;
 static int halted = 0;
+int counter = 0;
 
 void cpuInterrupt(unsigned short address) {
     interrupt.master = 0;
@@ -138,11 +139,11 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             break;
-        case 0x0D:    // DEF C
+        case 0x0D:    // DEC C
             registers.C -= 1;
-            SET_Z(registers.C);
+            SET_Z(!registers.C);
             SET_N(1);
-            SET_H((registers.C & 0xF) > ((registers.C-1) & 0xF));
+            SET_H(((registers.C & 0xF) == 0xF));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -1799,17 +1800,30 @@ void cpuCycle(void) {
             printf("Undefined instruction.");
             break;
     }
+   
+   if (interrupt.enable) {
+       printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
+   }
+   //printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
+   
+    // if (counter >= 1000) {
+        // printf("Instruction: %02X\n", (int)instruction);
+        // printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
+        // printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
+        // printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
+        // printf("Register HL: %02X%02X\n", (int)registers.H, (int)registers.L);
+        // printf("Register SP: %02X\n", (int)registers.SP);
+        // printf("Register PC: %02X\n", (int)registers.PC);
+        // printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t\n", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
+        // printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
+        // while(getchar()!='\n'); // option TWO to clean stdin
+    // }
+    // counter++;
 
+    // if (counter == 1000) {
+    //     registers.PC = 0x0040;
+    // }
     
-    printf("Instruction: %02X\n", (int)instruction);
-    printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
-    printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
-    printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
-    printf("Register HL: %02X%02X\n", (int)registers.H, (int)registers.L);
-    printf("Register SP: %02X\n", (int)registers.SP);
-    printf("Register PC: %02X\n", (int)registers.PC);
-    printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
-    while(getchar()!='\n'); // option TWO to clean stdin
     
 }
 

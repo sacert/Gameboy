@@ -264,7 +264,6 @@ int lcdCycle(void) {
     
     if (sdlUpdate())
         return 0;
-    
     LCD.frame = cycles % (70224/4); // 70224 clks per screen
     LCD.line = LCD.frame / (456/4); // 465 clks per line
 
@@ -293,6 +292,8 @@ int lcdCycle(void) {
         interrupt.flags |= VBLANK;
         sdlSetFrame();
     }
+
+    //printf("%i\n", LCD.line);
     
     prevLine = LCD.line;
     

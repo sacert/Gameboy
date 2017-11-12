@@ -1,9 +1,11 @@
+#include <stdio.h>
 #import "interrupt.h"
 #import "cpu.h"
 
 struct interrupt interrupt;
 
 void interruptCycle(void) {
+    
     // if everything is enabled and there is a flag set
     if (interrupt.master && interrupt.enable && interrupt.flags) {
         // get which interrupt is currently being executed

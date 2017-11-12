@@ -8,7 +8,7 @@ unsigned char readByte(unsigned short address) {
 
     if (0x0000 <= address && address <= 0x7FFF)
         return cart[address];
-    else if (0x8000 <= address && address <= 0x9FFF)
+    else if (0x8000 <= address && address <= 0x9FFF) 
         return vram[address - 0x8000];
     else if (0xA000 <= address && address <= 0xBFFF)
         return sram[address - 0xA000];
@@ -45,7 +45,7 @@ unsigned short readShort(unsigned short address) {
 }
 
 void writeByte(unsigned short address, unsigned char value) {
-
+    
     // cant write to ROM
     if (0x8000 <= address && address <= 0x9FFF)
         vram[address - 0x8000] = value;
@@ -59,7 +59,7 @@ void writeByte(unsigned short address, unsigned char value) {
         oam[address - 0xFE00] = value;
     else if (address == 0xFF0F)
         interrupt.flags = address;
-    else if (address == 0xFFFF)
+    else if (address == 0xFFFF) 
         interrupt.enable = address;
     else if (address == 0xFF40)
         setLCDC(address);
@@ -82,7 +82,7 @@ void writeByte(unsigned short address, unsigned char value) {
     else if (address == 0xFF4B)
         setWindowX(address);
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
-    		io[address - 0xff00] = value;
+    	io[address - 0xff00] = value;
     else if (0xFF80 <= address && address <= 0xFFFE)
         hram[address - 0xFF80] = value;
 }
