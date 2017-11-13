@@ -7,13 +7,14 @@
 struct registers registers;
 static int halted = 0;
 int counter = 0;
+int set = 0;
 
 void cpuInterrupt(unsigned short address) {
     interrupt.master = 0;
     registers.PC -= 2;
     writeShort(registers.SP, registers.PC);
     registers.PC = address;
-    interrupt.enable = 0;
+    registers.cycles += 3;
 }
 
 void cpuInit(void) {
@@ -135,7 +136,7 @@ void cpuCycle(void) {
             registers.C += 1;
             SET_Z(!registers.C);
             SET_N(0);
-            SET_H((registers.C & 0xF) < ((registers.C-1) & 0xF));
+            SET_H((int)((registers.C & 0xF) < ((registers.C-1) & 0xF)));
             registers.PC += 1;
             registers.cycles += 1;
             break;
@@ -1526,9 +1527,13 @@ void cpuCycle(void) {
             break;
         case 0xCD:    // CALL n
             registers.SP -= 2;
+            // printf("SP: %02X\n", registers.SP);
+            // printf("PC + 3: %02X\n", (registers.PC+3));
+            // printf("PC + 1: %02X\n", (registers.PC+1));
             writeShort(registers.SP, registers.PC+3);
             registers.PC = readShort(registers.PC+1);
             registers.cycles += 6;
+            while(getchar()!='\n'); // option TWO to clean stdin
             break;
         case 0xCE:    // ADC A,n
             i = registers.A + readByte(registers.PC) + FLAG_C;
@@ -1546,12 +1551,6 @@ void cpuCycle(void) {
             registers.PC = 0x08;
             registers.cycles += 4;
             break;
-        case 0xD1:    // POP DE
-            SET_DE(readShort(registers.SP) & 0xFFF0);
-            registers.SP += 2;
-            registers.PC += 1;
-            registers.cycles += 3;
-            break;
         case 0xD0:    // RET NC
             if (FLAG_C == 0) {
                 registers.PC = readShort(registers.SP);
@@ -1561,6 +1560,12 @@ void cpuCycle(void) {
                 registers.PC += 1;
                 registers.cycles += 2;
             }
+            break;
+        case 0xD1:    // POP DE
+            SET_DE(readShort(registers.SP) & 0xFFF0);
+            registers.SP += 2;
+            registers.PC += 1;
+            registers.cycles += 3;
             break;
         case 0xD2:    // JP NC,nn
             if (FLAG_C == 0) {
@@ -1619,6 +1624,7 @@ void cpuCycle(void) {
             registers.SP += 2;
             registers.cycles += 4;
             interrupt.master = 1;
+            interrupt.pending = 1;
             break;
         case 0xDA:    // JP C,nn
             if (FLAG_C == 1) {
@@ -1639,6 +1645,16 @@ void cpuCycle(void) {
                 registers.PC += 3;
                 registers.cycles += 3;
             }
+            break;
+        case 0xDE:    // SCC, nn
+            i = registers.A - readByte(registers.PC+1) + FLAG_C;
+            SET_Z(i);
+            SET_N(1);
+            SET_H((i & 0xF) > (registers.A & 0xF));
+            SET_C((i & 0xFF) > (registers.A & 0xFF));
+            registers.A = i;
+            registers.PC += 2;
+            registers.cycles += 2;
             break;
         case 0xDF:    // RST 18
             registers.SP -= 2;
@@ -1717,7 +1733,8 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         case 0xF0:    // LD A, ($FF00+n)
-            registers.A = readByte(registers.PC+ 0xFF00);
+            s = readByte(registers.PC+1);
+            registers.A = readByte(0xFF00 + s);
             registers.PC += 2;
             registers.cycles += 3;
             break;
@@ -1781,12 +1798,14 @@ void cpuCycle(void) {
             registers.PC += 1;
             registers.cycles += 1;
             interrupt.master = 1;
+            interrupt.pending = 1;
             break;
         case 0xFE:    // CP n
-            SET_Z(registers.A == readByte(registers.PC));
+            s = readByte(registers.PC+1);
+            SET_Z((int)(registers.A == s));
             SET_N(1);
-            SET_H(((registers.A-readByte(registers.PC)) & 0xF) > (registers.A & 0xF));
-            SET_C((registers.A < readByte(registers.PC)));
+            SET_H((int)(((registers.A-s) & 0xF) > (registers.A & 0xF)));
+            SET_C((int)(registers.A < s));
             registers.PC += 2;
             registers.cycles += 2;
             break;
@@ -1797,12 +1816,18 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         default:
+            printf("Instruction: %02X\n", (int)registers.PC);
+            while(getchar()!='\n'); // option TWO to clean stdin
             printf("Undefined instruction.");
             break;
     }
 
 
-   if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20) {
+        if (registers.PC == 0x69DA) {
+            set = 1;
+        } 
+//    if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20 && instruction != 0xF0 && instruction != 0xFE) {
+    if (set) {
        printf("Instruction: %02X\n", (int)instruction);
         printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
         printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);

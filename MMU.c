@@ -23,15 +23,15 @@ unsigned char readByte(unsigned short address) {
     else if (address == 0xFFFF)
         return interrupt.enable;
     else if (address == 0xFF40)
-        getLCDC();
+        return getLCDC();
     else if (address == 0xFF41)
-        getLCDS();
+        return getLCDS();
     else if (address == 0xFF42)
-        getScrollY();
+        return getScrollY();
     else if (address == 0xFF43)
-        getScrollX();
+        return getScrollX();
     else if (address == 0xFF44)
-        getLine();
+        return getLine();
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
     	return io[address - 0xff00];
     else if (0xFF80 <= address && address <= 0xFFFE)

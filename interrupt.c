@@ -5,7 +5,12 @@
 struct interrupt interrupt;
 
 void interruptCycle(void) {
-    
+
+    if (interrupt.pending == 1) {
+        interrupt.pending -= 1;
+        return;
+    }
+
     // if everything is enabled and there is a flag set
     if (interrupt.master && interrupt.enable && interrupt.flags) {
         // get which interrupt is currently being executed

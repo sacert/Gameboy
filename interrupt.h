@@ -8,6 +8,7 @@ struct interrupt {
     unsigned char master;
     unsigned char enable;
     unsigned char flags;
+    unsigned char pending;
 } extern interrupt;
 
 void interruptCycle(void);
