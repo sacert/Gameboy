@@ -11,7 +11,7 @@ int set = 0;
 
 void cpuInterrupt(unsigned short address) {
     interrupt.master = 0;
-    registers.PC -= 2;
+    registers.SP -= 2;
     writeShort(registers.SP, registers.PC);
     registers.PC = address;
     registers.cycles += 3;
@@ -1434,7 +1434,7 @@ void cpuCycle(void) {
             }
             break;
         case 0xC1:    // POP BC
-            SET_BC(readShort(registers.SP) & 0xFFF0);
+            SET_BC(readShort(registers.SP));
             registers.SP += 2;
             registers.PC += 1;
             registers.cycles += 3;
@@ -1562,7 +1562,7 @@ void cpuCycle(void) {
             }
             break;
         case 0xD1:    // POP DE
-            SET_DE(readShort(registers.SP) & 0xFFF0);
+            SET_DE(readShort(registers.SP));
             registers.SP += 2;
             registers.PC += 1;
             registers.cycles += 3;
@@ -1668,7 +1668,7 @@ void cpuCycle(void) {
             registers.cycles += 3;
             break;
         case 0xE1:    // POP HL
-            SET_HL(readShort(registers.SP) & 0xFFF0);
+            SET_HL(readShort(registers.SP));
             registers.SP += 2;
             registers.PC += 1;
             registers.cycles += 3;
@@ -1739,7 +1739,7 @@ void cpuCycle(void) {
             registers.cycles += 3;
             break;
         case 0xF1:    // POP AF
-            SET_AF(readShort(registers.SP) & 0xFFF0);
+            SET_AF(readShort(registers.SP));
             registers.SP += 2;
             registers.PC += 1;
             registers.cycles += 3;
@@ -1790,7 +1790,8 @@ void cpuCycle(void) {
             registers.cycles += 2;
             break;
         case 0xFA:    // LD A,(nn)
-            registers.A = readShort(registers.PC+1);
+            t = readShort(registers.PC+1);
+            registers.A = readByte(t);
             registers.PC += 3;
             registers.cycles += 4;
             break;
@@ -1823,7 +1824,7 @@ void cpuCycle(void) {
     }
 
 
-        if (registers.PC == 0x69DA) {
+        if (registers.PC == 0x29AC) {
             set = 1;
         } 
 //    if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20 && instruction != 0xF0 && instruction != 0xFE) {
