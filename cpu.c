@@ -3,6 +3,7 @@
 #include "cpu.h"
 #include "MMU.h"
 #include "interrupt.h"
+#include "rom.h"
 
 struct registers registers;
 static int halted = 0;
@@ -1670,7 +1671,7 @@ void cpuCycle(void) {
             registers.cycles += 3;
             break;
         case 0xE2:    // LD A,($FF00+C)
-            writeByte(registers.C + 0xFF00, registers.A);
+            writeByte((0xFF00 + registers.C), registers.A);
             registers.PC += 1;
             registers.cycles += 2;
             break;
@@ -1817,14 +1818,28 @@ void cpuCycle(void) {
             break;
     }
 
-
     // 0c27CD = sprite
-        if (registers.PC == 0x02c7) 
-            set = 1;
+    if (registers.PC == 0x029b) 
+        set = 1;
          
-//    if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20 && instruction != 0xF0 && instruction != 0xFE) {
     if (set) {
-       printf("Instruction: %02X\n", (int)instruction);
+        int romInfo[0x8000];
+        FILE *fp = fopen("tetris.txt", "w");
+        
+        for (i = 0; i < 0xFFFF; i++) {
+            if ((i % 16) == 0) {
+                fp = fopen("tetris.txt", "a");
+                fprintf(fp, "\n %04X: ", i);
+                fclose(fp);
+            }
+            fp = fopen("tetris.txt", "a");
+            fprintf(fp, "%02X ", (int)readByte(i));
+            fclose(fp);
+        }
+        
+        fclose(fp);
+  
+        printf("Instruction: %02X\n", (int)instruction);
         printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
         printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
         printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
@@ -1833,29 +1848,8 @@ void cpuCycle(void) {
         printf("Register PC: %02X\n", (int)registers.PC);
         printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t\n", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
         printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
-       while(getchar()!='\n'); // option TWO to clean stdin
-   }
-   //printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
-   
-    // if (counter >= 1000) {
-        // printf("Instruction: %02X\n", (int)instruction);
-        // printf("Register AF: %02X%02X\n", (int)registers.A, (int)registers.F);
-        // printf("Register BC: %02X%02X\n", (int)registers.B, (int)registers.C);
-        // printf("Register DE: %02X%02X\n", (int)registers.D, (int)registers.E);
-        // printf("Register HL: %02X%02X\n", (int)registers.H, (int)registers.L);
-        // printf("Register SP: %02X\n", (int)registers.SP);
-        // printf("Register PC: %02X\n", (int)registers.PC);
-        // printf("Flag Z: %i\t Flag N: %i\t Flag H: %i\t Flag C: %i\t\n", (int)FLAG_Z, (int)FLAG_N, (int)FLAG_H, (int)FLAG_C);
-        // printf("Master: %u, Enable: %u, Flags: %u\n", interrupt.master, interrupt.enable, interrupt.flags);
-        // while(getchar()!='\n'); // option TWO to clean stdin
-    // }
-    // counter++;
-
-    // if (counter == 1000) {
-    //     registers.PC = 0x0040;
-    // }
-    
-    
+        while(getchar()!='\n'); // option TWO to clean stdin
+   }    
 }
 
 void cbPrefix(unsigned char inst) {

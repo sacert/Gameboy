@@ -3,12 +3,14 @@
 #include "MMU.h"
 #include "interrupt.h"
 #include "lcd.h"
+#include "timer.h"
+#include "sdl.h"
 
 unsigned char readByte(unsigned short address) {
 
     unsigned char mask = 0;
 
-    if (0x0000 <= address && address <= 0x7FFF)
+    if (0x0000 <= address && address <= 0x7FFF) 
         return cart[address];
     else if (0x8000 <= address && address <= 0x9FFF) 
         return vram[address - 0x8000];
@@ -26,12 +28,20 @@ unsigned char readByte(unsigned short address) {
         } else if (!(io[0x00] & 0x10)) {
             mask = getDirection();
         }
-        return (0xC0 | (0xF ^ mask) | ((io[0x00] & 0x20) | io[0x00] & 0x10));
+        return (0xC0 | (0xF ^ mask) | ((io[0x00] & 0x20) | (io[0x00] & 0x10)));
     }
     else if (address == 0xFF0F)
         return interrupt.flags;
     else if (address == 0xFFFF)
         return interrupt.enable;
+    else if (address == 0xFF04)
+        return getDiv();
+    else if (address == 0xFF05)
+        return getTima();
+    else if (address == 0xFF06)
+        return getTma();
+    else if (address == 0xFF04)
+        return getTac();
     else if (address == 0xFF40)
         return getLCDC();
     else if (address == 0xFF41)
@@ -43,8 +53,8 @@ unsigned char readByte(unsigned short address) {
     else if (address == 0xFF44)
         return getLine();
     else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
-    	return io[address - 0xff00];
-    else if (0xFF80 <= address && address <= 0xFFFE)
+    	return io[address - 0xFF00];
+    else if (0xFF80 <= address && address <= 0xFFFE) 
         return hram[address - 0xFF80];
 
     return 0;
@@ -67,10 +77,22 @@ void writeByte(unsigned short address, unsigned char value) {
         vram[address - 0xE000] = value;
     else if (0xFE00 <= address && address <= 0xFEFF)
         oam[address - 0xFE00] = value;
+    else if(0xFF00 <= address && address <= 0xFF7F)  // maybe only up to 0xFF4F 
+    	io[address - 0xFF00] = value;
+    else if (0xFF80 <= address && address <= 0xFFFE) 
+        hram[address - 0xFF80] = value;
     else if (address == 0xFF0F)
         interrupt.flags = value;
     else if (address == 0xFFFF) 
         interrupt.enable = value;
+    else if (address == 0xFF04)
+        setDiv(address);
+    else if (address == 0xFF05)
+        setTima(address);
+    else if (address == 0xFF06)
+        setTma(address);
+    else if (address == 0xFF04)
+        setTac(address);
     else if (address == 0xFF40)
         setLCDC(address);
     else if (address == 0xFF41)
@@ -91,10 +113,7 @@ void writeByte(unsigned short address, unsigned char value) {
         setWindowY(address);
     else if (address == 0xFF4B)
         setWindowX(address);
-    else if(0xFF00 <= address && address <= 0xFF7F) // maybe only up to 0xFF4F
-    	io[address - 0xff00] = value;
-    else if (0xFF80 <= address && address <= 0xFFFE)
-        hram[address - 0xFF80] = value;
+    
 }
 
 void writeShort(unsigned short address, unsigned short value) {
