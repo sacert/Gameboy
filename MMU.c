@@ -6,6 +6,8 @@
 
 unsigned char readByte(unsigned short address) {
 
+    unsigned char mask = 0;
+
     if (0x0000 <= address && address <= 0x7FFF)
         return cart[address];
     else if (0x8000 <= address && address <= 0x9FFF) 
@@ -18,6 +20,14 @@ unsigned char readByte(unsigned short address) {
         return wram[address - 0xE000];
     else if (0xFE00 <= address && address <= 0xFEFF)
         return oam[address - 0xFE00];
+    else if (address == 0xFF00) {
+        if (!(io[0x00] & 0x20)) {
+            mask = getButton();
+        } else if (!(io[0x00] & 0x10)) {
+            mask = getDirection();
+        }
+        return (0xC0 | (0xF ^ mask) | ((io[0x00] & 0x20) | io[0x00] & 0x10));
+    }
     else if (address == 0xFF0F)
         return interrupt.flags;
     else if (address == 0xFFFF)

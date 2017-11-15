@@ -1527,13 +1527,9 @@ void cpuCycle(void) {
             break;
         case 0xCD:    // CALL n
             registers.SP -= 2;
-            // printf("SP: %02X\n", registers.SP);
-            // printf("PC + 3: %02X\n", (registers.PC+3));
-            // printf("PC + 1: %02X\n", (registers.PC+1));
             writeShort(registers.SP, registers.PC+3);
             registers.PC = readShort(registers.PC+1);
             registers.cycles += 6;
-            while(getchar()!='\n'); // option TWO to clean stdin
             break;
         case 0xCE:    // ADC A,n
             i = registers.A + readByte(registers.PC) + FLAG_C;
@@ -1817,16 +1813,15 @@ void cpuCycle(void) {
             registers.cycles += 4;
             break;
         default:
-            printf("Instruction: %02X\n", (int)registers.PC);
-            while(getchar()!='\n'); // option TWO to clean stdin
             printf("Undefined instruction.");
             break;
     }
 
 
-        if (registers.PC == 0x29AC) {
+    // 0c27CD = sprite
+        if (registers.PC == 0x02c7) 
             set = 1;
-        } 
+         
 //    if (instruction != 0x32 && instruction != 0x05 && instruction != 0x20 && instruction != 0xF0 && instruction != 0xFE) {
     if (set) {
        printf("Instruction: %02X\n", (int)instruction);

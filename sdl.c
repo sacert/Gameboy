@@ -116,3 +116,11 @@ unsigned int *sdlFrameBuffer(void) {
 void sdlQuit(void) {
     SDL_Quit();
 }
+
+unsigned int getButton(void) {
+    return ((buttons.start * 8) | (buttons.select * 4) | (buttons.b * 2) | buttons.a);
+}
+
+unsigned int getDirection(void) {
+    return ((buttons.down * 8) | (buttons.up * 4) | (buttons.left * 2) | buttons.right);
+}
