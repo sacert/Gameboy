@@ -1994,7 +1994,7 @@ void cbPrefix(unsigned char inst) {
             break;
         case 0x0E:    // RRC (HL)
             s = (readByte(GET_HL()) & 0x1);
-            writeByte(((GET_HL() >> 1) | (s << 7)));
+            writeByte((GET_HL(), ((readByte(GET_HL()) << 1) | (s));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
@@ -2058,9 +2058,9 @@ void cbPrefix(unsigned char inst) {
             SET_H(0);
             break;
         case 0x16:    // RL (HL)
-            s = readByte(GET_HL());
-            SET_HL(((GET_HL() << 1) | FLAG_C));
-            SET_C((s >> 7));
+            s = readByte(GET_HL()) >> 7;
+            writeByte((GET_HL(), ((readByte(GET_HL()) << 1) | (FLAG_C));
+            SET_C((s));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
@@ -2124,7 +2124,7 @@ void cbPrefix(unsigned char inst) {
             break;
         case 0x1E:    // RR (HL)
             s = (readByte(GET_HL()) & 0x1);
-            SET_HL(((GET_HL() >> 1) | (FLAG_C << 7)));
+            writeByte((GET_HL(), ((readByte(GET_HL()) >> 1) | (FLAG_C << 7));
             SET_C(s);
             SET_Z(!GET_HL());
             SET_N(0);
@@ -2190,6 +2190,7 @@ void cbPrefix(unsigned char inst) {
         case 0x26:    // SLA HL
             s = (readByte(GET_HL()) >> 7);
             SET_HL(((GET_HL() << 1)));
+            writeByte((GET_HL(), ((readByte(GET_HL()) << 1)));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
@@ -2253,9 +2254,9 @@ void cbPrefix(unsigned char inst) {
             SET_H(0);
             break;
         case 0x2E:    // SRA (HL)
-            s = readByte(GET_HL());
-            SET_HL(((GET_HL() >> 1) | (GET_HL() & 0x80)));
-            SET_C((s >> 7));
+            s = readByte(GET_HL()) >> 7;
+            writeByte((GET_HL(), ((readByte(GET_HL()) >> 1) | (s));
+            SET_C((s));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
@@ -2375,9 +2376,9 @@ void cbPrefix(unsigned char inst) {
             SET_H(0);
             break;
         case 0x3E:    // SRL (HL)
-            s = readByte(GET_HL());
-            SET_HL(((GET_HL() >> 1)));
-            SET_C((s >> 7));
+            s = readByte(GET_HL()) >> 7;
+            writeByte((GET_HL(), ((readByte(GET_HL()) >> 1));
+            SET_C((s));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
@@ -2763,7 +2764,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xFD;
             break;
         case 0x8E:    // RES (HL) 1
-            SET_HL((GET_HL() & 0xFD));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xFD));
             registers.cycles += 2;
             break;
         case 0x8F:    // RES A 1
@@ -2788,7 +2789,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xFB;
             break;
         case 0x96:    // RES (HL) 2
-            SET_HL((GET_HL() & 0xFB));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xFB));
             registers.cycles += 2;
             break;
         case 0x97:    // RES A 2
@@ -2813,7 +2814,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xF7;
             break;
         case 0x9E:    // RES (HL) 3
-            SET_HL((GET_HL() & 0xF7));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xF7));
             registers.cycles += 2;
             break;
         case 0x9F:    // RES A 3
@@ -2838,7 +2839,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xEF;
             break;
         case 0xA6:    // RES (HL) 4
-            SET_HL((GET_HL() & 0xEF));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xEF));
             registers.cycles += 2;
             break;
         case 0xA7:    // RES A 4
@@ -2863,7 +2864,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xDF;
             break;
         case 0xAE:    // RES (HL) 5
-            SET_HL((GET_HL() & 0xDF));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xDF));
             registers.cycles += 2;
             break;
         case 0xAF:    // RES A 5
@@ -2888,7 +2889,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0xBF;
             break;
         case 0xB6:    // RES (HL) 6
-            SET_HL((GET_HL() & 0xBF));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0xBF));
             registers.cycles += 2;
             break;
         case 0xB7:    // RES A 6
@@ -2913,7 +2914,7 @@ void cbPrefix(unsigned char inst) {
             registers.L &= 0x7F;
             break;
         case 0xBE:    // RES (HL) 7
-            SET_HL((GET_HL() & 0x7F));
+            writeByte(GET_HL(), (readByte(GET_HL()) & 0x7F));
             registers.cycles += 2;
             break;
         case 0xBF:    // RES A 7
@@ -2938,7 +2939,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x01;
             break;
         case 0xC6:    // SET (HL) 0
-            SET_HL((GET_HL() | 0x01));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x01));
             registers.cycles += 2;
             break;
         case 0xC7:    // SET A 0
@@ -2963,7 +2964,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x02;
             break;
         case 0xCE:    // SET (HL) 1
-            SET_HL((GET_HL() | 0x02));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x02));
             registers.cycles += 2;
             break;
         case 0xCF:    // SET A 1
@@ -2988,7 +2989,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x04;
             break;
         case 0xD6:    // SET (HL) 2
-            SET_HL((GET_HL() | 0x04));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x04));
             registers.cycles += 2;
             break;
         case 0xD7:    // SET A 2
@@ -3013,7 +3014,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x08;
             break;
         case 0xDE:    // SET (HL) 3
-            SET_HL((GET_HL() | 0x08));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x08));
             registers.cycles += 2;
             break;
         case 0xDF:    // SET A 3
@@ -3038,7 +3039,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x10;
             break;
         case 0xE6:    // SET (HL) 4
-            SET_HL((GET_HL() | 0x10));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x10));
             registers.cycles += 2;
             break;
         case 0xE7:    // SET A 4
@@ -3063,7 +3064,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x20;
             break;
         case 0xEE:    // SET (HL) 5
-            SET_HL((GET_HL() | 0x20));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x20));
             registers.cycles += 2;
             break;
         case 0xEF:    // SET A 5
@@ -3088,7 +3089,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x40;
             break;
         case 0xF6:    // SET (HL) 6
-            SET_HL((GET_HL() | 0x40));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x40));
             registers.cycles += 2;
             break;
         case 0xF7:    // SET A 6
@@ -3113,7 +3114,7 @@ void cbPrefix(unsigned char inst) {
             registers.L |= 0x80;
             break;
         case 0xFE:    // SET (HL) 7
-            SET_HL((GET_HL() | 0x80));
+            writeByte(GET_HL(), (readByte(GET_HL()) | 0x80));
             registers.cycles += 2;
             break;
         case 0xFF:    // SET A 7
