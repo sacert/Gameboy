@@ -15,7 +15,7 @@ int main(int argc, char* argv[]) {
     romInit(argv[1]); // loads rom
     cpuInit(); // initialize registers and memory
     sdlInit();
-
+    
     while (1) {
         cpuCycle();
         lcdCycle();
