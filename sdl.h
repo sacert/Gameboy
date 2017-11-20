@@ -26,7 +26,7 @@ struct display {
 
 void sdlInit(void);
 void sdlSetFrame(void);
-int sdlUpdate(void);
+void sdlUpdate(void);
 unsigned int *sdlFrameBuffer(void);
 unsigned int getButton(void);
 unsigned int getDirection(void);

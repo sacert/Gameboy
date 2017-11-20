@@ -111,88 +111,97 @@ void sortSprites(struct sprite* sprite, int c) {
     }
 }
 
-void drawBgWindow(unsigned int* buf, int line) {
+void drawBgWindow(unsigned int *buf, int line) {
+	int x;
+	for(x = 0; x < 160; x++) // for the x size of the window (160x144)
+	{
+		unsigned int mapSelect, tileMapOffset, tileNum, tileAddr, currX, currY;
+        unsigned char buf1, buf2, mask, colour;
 
-    int x;
-    for (x = 0; x < 160; x++) {
-
-        unsigned int xShift, yShift, map, mapOffset, tileNum, tileAddr;
-        unsigned char buf1, buf2, colour;
-
-        if (LCDC.windowDisplay && line >= LCD.windowY && line-LCD.windowY< 144) {
-            xShift = x;
-            yShift = line - LCD.windowY;
-            map = LCDC.windowTileMap;
-        } else {
-            if (!LCDC.bgWindowDisplay) {
-                buf[line*640 + x] = 0;
-            }
-            xShift = (x + LCD.scrollX) % 256;
-            yShift = (line + LCD.scrollX) % 256;
-            map = LCDC.tileMapSelect;
+		if(line >= LCD.windowY && LCDC.windowDisplay) { // wind
+			currX = x;
+			currY = line - LCD.windowY;
+			mapSelect = LCDC.windowTileMap;
+		} else if (LCDC.bgWindowDisplay) { // background
+			currX = (x + LCD.scrollX) % 256; // mod 256 since if it goes off the screen, it wraps around
+			currY = (line + LCD.scrollY) % 256;
+			mapSelect = LCDC.tileMapSelect;
+		} else { // neither
+            buf[line*160 + x] = 0; // if not window or background, make it white
+            return;
         }
-        mapOffset = (yShift/8)*32 + xShift/8;
-        tileNum = readByte(0x9800 + map * 0x400 + mapOffset);
 
-        if (LCDC.tileMapSelect)
-            tileAddr = 0x8000 + tileNum*16;
-        else
-            tileAddr = 0x9000 + ((signed char)tileNum)*16;
-        
-        buf1 = readByte(tileAddr + (yShift%8)*2);
-        buf2 = readByte(tileAddr + (yShift%8)*2 + 1);
-        colour = ((!!(buf2 & (128 >> xShift%8))<<1) | !!(buf1 & (128 >> xShift%8)));
-        buf[line * 640 + x] = colours[bgPalette[colour]];
+        // map window to 32 rows of 32 bytes
+		tileMapOffset = (currY/8)*32 + currX/8;
 
-    }
+		tileNum = readByte(0x9800 + mapSelect*0x400 + tileMapOffset);
+		if(LCDC.tileDataSelect)
+			tileAddr = 0x8000 + (tileNum*16) + ((currY%8)*2);
+		else
+			tileAddr = 0x9000 + (((signed int)tileNum)*16) + ((currY%8)*2); // pattern 0 lies at 0x9000
+
+		buf1 = readByte(tileAddr); // 2 bytes represent the line
+		buf2 = readByte(tileAddr+1);
+		mask = 128>>(currX%8);
+		colour = (!!(buf2&mask)<<1) | !!(buf1&mask);
+		buf[line*160 + x] = colours[bgPalette[colour]];
+	}
 }
 
-void draw_sprites(unsigned int *b, int line, int nsprites, struct sprite *s)
-{
-	int i;
-
-	for(i = 0; i < nsprites; i++)
+void drawSprites(unsigned int *buf, int line, int blocks, struct sprite *sprite) {
+	
+    int i;
+	for(i = 0; i < blocks; i++)
 	{
-		unsigned int b1, b2, tile_addr, sprite_line, x;
+		unsigned int buf1, buf2, tileAddr, spriteRow, x;
 
-		/* Sprite is offscreen */
-		if(s[i].x < -7)
+		// off screen
+		if(sprite[i].x < -7)
 			continue;
 
-		/* Which line of the sprite (0-7) are we rendering */
-		sprite_line = s[i].flags & 0x40 ? (LCDC.spriteSize ? 15 : 7)-(line - s[i].y) : line - s[i].y;
+        if (sprite[i].flags & 0x40) {
+            int size;
+            if (LCDC.spriteSize == 15)
+                size = 15;
+            else 
+                size = 7;
+            spriteRow = size - (line - sprite[i].y); 
+        } else {
+            spriteRow = line - sprite[i].y;
+        }
 
-		/* Address of the tile data for this sprite line */
-		tile_addr = 0x8000 + (s[i].patternNum*16) + sprite_line*2;
+        // similar to background
+		tileAddr = 0x8000 + (sprite[i].patternNum*16) + spriteRow*2;
 
-		/* The two bytes of data holding the palette entries */
-		b1 = readByte(tile_addr);
-		b2 = readByte(tile_addr+1);
+		buf1 = readByte(tileAddr);
+		buf2 = readByte(tileAddr+1);
 
-		/* For each pixel in the line, draw it */
+		// draw each pixel
 		for(x = 0; x < 8; x++)
 		{
+            // out of bounds check
+            if((sprite[i].x + x) >= 160 && sprite[i].x < 0)
+				continue;
+
 			unsigned char mask, colour;
 			int *pal;
 
-			if((s[i].x + x) >= 160)
+			mask = sprite[i].flags & 0x20 ? 128>>(7-x) : 128>>x;
+			colour = ((!!(buf2&mask))<<1) | !!(buf1&mask);
+
+			if(colour == 0) // no need to draw it
 				continue;
 
-			mask = s[i].flags & 0x20 ? 128>>(7-x) : 128>>x;
-			colour = ((!!(b2&mask))<<1) | !!(b1&mask);
-			if(colour == 0)
-				continue;
+			pal = (sprite[i].flags & 0x10) ? spritePalette2 : spritePalette1;
 
-
-			pal = (s[i].flags & 0x10) ? spritePalette2 : spritePalette1;
-			/* Sprite is behind BG, only render over palette entry 0 */
-			if(s[i].flags & 0x80)
+			// only render over colour 0
+			if(sprite[i].flags & 0x80)
 			{
-				unsigned int temp = b[line*640+(x + s[i].x)];
+				unsigned int temp = buf[line*160+(x + sprite[i].x)];
 				if(temp != colours[bgPalette[0]])
 					continue;
 			}
-			b[line*640+(x + s[i].x)] = colours[pal[colour]];
+			//buf[line*160+(x + sprite[i].x)] = colours[pal[colour]]; // for testing
 		}
 	}
 }
@@ -206,11 +215,15 @@ void renderLine(int line) {
 
     // OAM is divided into 40 4-byte blocks each - corresponding to a sprite
     for (i = 0; i < 40; i++) {
+
+        int y;
+        y = readByte(0xFE00 + (i*4) - 16);
         sprite[c].y = readByte(0xFE00 + (i*4)) - 16; // read OAM
         
-        if (line < sprite[c].y || line >= sprite[c].y + 8 + (8*LCDC.spriteSize)) // out of bounds check
+        if (line < y || line >= y + 8 + (8*LCDC.spriteSize)) // out of bounds check
             continue;
         
+        sprite[c].y = y;
         sprite[c].x = readByte(0xFE00 + (i*4) + 1) - 8;
         sprite[c].patternNum = readByte(0xFE00 + (i*4) + 2);
         sprite[c].flags = readByte(0xFE00 + (i*4) + 3);
@@ -221,40 +234,11 @@ void renderLine(int line) {
             break;
     }
 
-    if (c > 0)
+    if (c)
         sortSprites(sprite, c);
 
     drawBgWindow(buf, line);
-    draw_sprites(buf, line, c, sprite);
-}
-
-void draw_stuff(void)
-{
-	unsigned int *b = sdlFrameBuffer();
-	int y, tx, ty;
-
-	for(ty = 0; ty < 24; ty++)
-	{
-	for(tx = 0; tx < 16; tx++)
-	{
-	for(y = 0; y<8; y++)
-	{
-		unsigned char b1, b2;
-		int tileaddr = 0x8000 +  ty*0x100 + tx*16 + y*2;
-
-		b1 = readByte(tileaddr);
-		b2 = readByte(tileaddr+1);
-		b[(ty*640*8)+(tx*8) + (y*640) + 0 + 0x1F400] = colours[(!!(b1&0x80))<<1 | !!(b2&0x80)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 1 + 0x1F400] = colours[(!!(b1&0x40))<<1 | !!(b2&0x40)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 2 + 0x1F400] = colours[(!!(b1&0x20))<<1 | !!(b2&0x20)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 3 + 0x1F400] = colours[(!!(b1&0x10))<<1 | !!(b2&0x10)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 4 + 0x1F400] = colours[(!!(b1&0x8))<<1 | !!(b2&0x8)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 5 + 0x1F400] = colours[(!!(b1&0x4))<<1 | !!(b2&0x4)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 6 + 0x1F400] = colours[(!!(b1&0x2))<<1 | !!(b2&0x2)];
-		b[(ty*640*8)+(tx*8) + (y*640) + 7 + 0x1F400] = colours[(!!(b1&0x1))<<1 | !!(b2&0x1)];
-	}
-	}
-	}
+    drawSprites(buf, line, c, sprite);
 }
 
 int lcdCycle(void) {
@@ -262,16 +246,15 @@ int lcdCycle(void) {
     int cycles = getCycles();
     int prevLine;
     
-    if (sdlUpdate())
-        return 0;
-    LCD.frame = cycles % (70224/4); // 70224 clks per screen
-    LCD.line = LCD.frame / (456/4); // 465 clks per line
+    sdlUpdate();
+    LCD.frame = cycles % (70224/64); // 70224 clks per screen
+    LCD.line = LCD.frame / (456/64); // 465 clks per line
 
-    if (LCD.frame < 204/4)
+    if (LCD.frame < 204/64)
         LCDS.modeFlag = 2;  // OAM
-    else if (LCD.frame < 284/4)
+    else if (LCD.frame < 284/64)
         LCDS.modeFlag = 3;  // VRA
-    else if (LCD.frame < 456/4)
+    else if (LCD.frame < 456/64)
         LCDS.modeFlag = 0;  // HBlank
     
     // Done all lines
@@ -288,12 +271,9 @@ int lcdCycle(void) {
 
     if (LCD.line == 144) {
         // draw the entire frame
-        draw_stuff();
         interrupt.flags |= VBLANK;
         sdlSetFrame();
     }
-
-    //printf("%i\n", LCD.line);
     
     prevLine = LCD.line;
     

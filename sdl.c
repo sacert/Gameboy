@@ -5,41 +5,39 @@ struct buttons buttons;
 struct display display;
 unsigned int frames;
 
-SDL_Surface *test;
+SDL_Surface *screen;
 
 void sdlInit(void) {
     SDL_Init(SDL_INIT_VIDEO);
-    display.screen = SDL_CreateWindow("Game Boy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_SHOWN); 
-    test = SDL_GetWindowSurface(display.screen);
+    display.screen = SDL_CreateWindow("Game Boy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 160, 144, SDL_WINDOW_SHOWN); 
+    screen = SDL_GetWindowSurface(display.screen);
     frames = 0;
 }
 
 void sdlSetFrame(void) {
 
-    if (display.frames == 0) {
+    if (frames == 0) {
         gettimeofday(&t1, NULL);
     }
     frames++;
-    if (display.frames % 100 == 0) { // try it out with 100 frames, might give a good enough estiamte of fps
+    if (frames % 1000 == 0) { 
         gettimeofday(&t2, NULL);
-        //printf("FPS: %ld\n", frames/(t2.tv_sec - t1.tv_sec));
+        printf("FPS: %i\n", frames/((int)t2.tv_sec - (int)t1.tv_sec));
     }
 
     /* may need the following */
     // display.surface = get it up
-    // display.texture = SDL_CreateTextureFromSurface(display.renderer, display.surface);
-    // SDL_FreeSurface(display.surface);
+    //  display.texture = SDL_CreateTextureFromSurface(display.renderer, display.surface);
+    //  SDL_FreeSurface(display.surface);
     // SDL_RenderClear(display.renderer);
-    // SDL_RenderCopy(display.renderer, display.texture, NULL, NULL);
-    // SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
+    //  SDL_RenderCopy(display.renderer, display.texture, NULL, NULL);
+    //  SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
     SDL_UpdateWindowSurface(display.screen);
-    display.frames++;
-    frames++;
 }
 
-int sdlUpdate(void) {
+void sdlUpdate(void) {
     SDL_Event event;
-
+    
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_KEYDOWN:
@@ -106,11 +104,11 @@ int sdlUpdate(void) {
                 break;
         }
     }
-    return 0;
+    //SDL_PushEvent(&event);
 }
 
 unsigned int *sdlFrameBuffer(void) {
-    return test->pixels;
+    return screen->pixels;
 }
 
 void sdlQuit(void) {

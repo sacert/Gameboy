@@ -6,6 +6,9 @@
 #include "timer.h"
 #include "sdl.h"
 
+int joypadButtons;
+int joypadDirections;
+
 unsigned char readByte(unsigned short address) {
 
     unsigned char mask = 0;
@@ -23,12 +26,11 @@ unsigned char readByte(unsigned short address) {
     else if (0xFE00 <= address && address <= 0xFEFF)
         return oam[address - 0xFE00];
     else if (address == 0xFF00) {
-        if (!(io[0x00] & 0x20)) {
+        if (!joypadButtons) 
             mask = getButton();
-        } else if (!(io[0x00] & 0x10)) {
+        if (!joypadDirections) 
             mask = getDirection();
-        }
-        return (0xC0 | (0xF ^ mask) | ((io[0x00] & 0x20) | (io[0x00] & 0x10)));
+        return (0xC0 | (0xF ^ mask) | ((joypadButtons) | (joypadDirections)));
     }
     else if (address == 0xFF0F)
         return interrupt.flags;
@@ -66,6 +68,14 @@ unsigned short readShort(unsigned short address) {
 
 void writeByte(unsigned short address, unsigned char value) {
 
+    if(address == 0xFFFF) {
+        printf("enable: %02x\n", value);
+    }
+
+    if(address == 0xFF0F) {
+        printf("value: %02x\n", value);
+    }
+
     // cant write to ROM
     if (0x8000 <= address && address <= 0x9FFF)
         vram[address - 0x8000] = value;
@@ -77,42 +87,48 @@ void writeByte(unsigned short address, unsigned char value) {
         vram[address - 0xE000] = value;
     else if (0xFE00 <= address && address <= 0xFEFF)
         oam[address - 0xFE00] = value;
-    else if(0xFF00 <= address && address <= 0xFF7F)  // maybe only up to 0xFF4F 
-    	io[address - 0xFF00] = value;
     else if (0xFF80 <= address && address <= 0xFFFE) 
         hram[address - 0xFF80] = value;
-    else if (address == 0xFF0F)
+    else if (address == 0xFF0F) {
         interrupt.flags = value;
-    else if (address == 0xFFFF) 
+    }
+    else if (address == 0xFFFF) {
         interrupt.enable = value;
+    }
     else if (address == 0xFF04)
-        setDiv(address);
+        setDiv(value);
     else if (address == 0xFF05)
-        setTima(address);
+        setTima(value);
     else if (address == 0xFF06)
-        setTma(address);
+        setTma(value);
     else if (address == 0xFF04)
-        setTac(address);
-    else if (address == 0xFF40)
-        setLCDC(address);
+        setTac(value);
+    else if (address == 0xFF40) 
+        setLCDC(value);
     else if (address == 0xFF41)
-        setLCDS(address);
+        setLCDS(value);
     else if (address == 0xFF42)
-        setScrollY(address);
+        setScrollY(value);
     else if (address == 0xFF43)
-        setScrollX(address);
+        setScrollX(value);
     else if (address == 0xFF45)
-        setLyCompare(address);
+        setLyCompare(value);
     else if (address == 0xFF47)
-        setBGPalette(address);
+        setBGPalette(value);
     else if (address == 0xFF48)
-        setSpritePalette1(address);
+        setSpritePalette1(value);
     else if (address == 0xFF49)
-        setSpritePalette2(address);
+        setSpritePalette2(value);
     else if (address == 0xFF4A)
-        setWindowY(address);
+        setWindowY(value);
     else if (address == 0xFF4B)
-        setWindowX(address);
+        setWindowX(value);
+    else if (address == 0xFF00) {
+        joypadDirections = value & 0x10;
+        joypadButtons = value & 0x20;
+    }
+    else if(0xFF00 <= address && address <= 0xFF7F) 
+    	io[address - 0xFF00] = value;
     
 }
 

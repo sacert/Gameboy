@@ -58,5 +58,6 @@ int getLine(void);
 
 int lcdCycle(void);
 void renderLine(int line);
-void draw_sprites(unsigned int *b, int line, int nsprites, struct sprite *s);
+void drawBgWindow(unsigned int *buf, int line);
+void drawSprites(unsigned int *buf, int line, int blocks, struct sprite *sprite);
 void draw_stuff(void);
