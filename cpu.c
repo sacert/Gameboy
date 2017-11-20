@@ -1994,7 +1994,7 @@ void cbPrefix(unsigned char inst) {
             break;
         case 0x0E:    // RRC (HL)
             s = (readByte(GET_HL()) & 0x1);
-            SET_HL(((GET_HL() >> 1) | (s << 7)));
+            writeByte(((GET_HL() >> 1) | (s << 7)));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
