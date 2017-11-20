@@ -1929,7 +1929,7 @@ void cbPrefix(unsigned char inst) {
             break;
         case 0x06:    // RLC HL
             s = (readByte(GET_HL()) >> 7);
-            SET_HL(((GET_HL() << 1) | s));
+            writeByte(GET_HL(), (((readByte(GET_HL()) << 1) | s));
             SET_Z(!GET_HL());
             SET_N(0);
             SET_H(0);
