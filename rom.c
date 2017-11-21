@@ -41,27 +41,5 @@ void romInit(char* filename) {
   printf("Ram Size: %i\n", rom.ramSize);
   printf("Rom Type: %i\n", rom.romType);
 
-
-  //get file to manually read bytes 
-  /* printf("Printing to txt\n");
-  printf("%X\n", (int)rom.romBytes[1]);
-  printf("%c\n ", rom.romBytes[0x0134]);
-  
-  int romInfo[0x8000];
-  FILE *fp = fopen("tetris.txt", "w");
-  
-  for (i = 0; i < 0x8000; i++) {
-      if ((i % 16) == 0) {
-        fp = fopen("tetris.txt", "a");
-        fprintf(fp, "\n %04X: ", i);
-        fclose(fp);
-      }
-      fp = fopen("tetris.txt", "a");
-      fprintf(fp, "%02X ", (int)rom.romBytes[i]);
-      fclose(fp);
-  }
-  
-  fclose(fp);
-  */
   fclose(f);
 }

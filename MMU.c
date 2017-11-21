@@ -33,9 +33,9 @@ unsigned char readByte(unsigned short address) {
         return (0xC0 | (0xF ^ mask) | ((joypadButtons) | (joypadDirections)));
     }
     else if (address == 0xFF0F)
-        return interrupt.flags;
+        return interrupt.flags & 0x1F;
     else if (address == 0xFFFF)
-        return interrupt.enable;
+        return interrupt.enable & 0x1F;
     else if (address == 0xFF04)
         return getDiv();
     else if (address == 0xFF05)
@@ -68,13 +68,13 @@ unsigned short readShort(unsigned short address) {
 
 void writeByte(unsigned short address, unsigned char value) {
 
-    if(address == 0xFFFF) {
-        printf("enable: %02x\n", value);
-    }
+    // if(address == 0xFFFF) {
+    //     printf("enable: %02x\n", value);
+    // }
 
-    if(address == 0xFF0F) {
-        printf("value: %02x\n", value);
-    }
+    // if(address == 0xFF0F) {
+    //     printf("value: %02x\n", value);
+    // }
 
     // cant write to ROM
     if (0x8000 <= address && address <= 0x9FFF)
@@ -90,10 +90,10 @@ void writeByte(unsigned short address, unsigned char value) {
     else if (0xFF80 <= address && address <= 0xFFFE) 
         hram[address - 0xFF80] = value;
     else if (address == 0xFF0F) {
-        interrupt.flags = value;
+        interrupt.flags = value & 0x1F;
     }
     else if (address == 0xFFFF) {
-        interrupt.enable = value;
+        interrupt.enable = value & 0x1F;
     }
     else if (address == 0xFF04)
         setDiv(value);
