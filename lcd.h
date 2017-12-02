@@ -56,7 +56,7 @@ unsigned char getWindowX(void);
 unsigned char getWindowY(void);
 int getLine(void);
 
-int lcdCycle(void);
+int lcdCycle(int timeStart);
 void renderLine(int line);
 void drawBgWindow(unsigned int *buf, int line);
 void drawSprites(unsigned int *buf, int line, int blocks, struct sprite *sprite);

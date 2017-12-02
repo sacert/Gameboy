@@ -37,6 +37,9 @@ struct registers {
     unsigned int cycles;
 } registers;
 
+
+extern struct registers registers;
+
 void cpuInterrupt(unsigned short address);
 void cpuInit(void);
 unsigned int getCycles(void);

@@ -9,6 +9,12 @@
 int joypadButtons;
 int joypadDirections;
 
+void copyToOAM(unsigned short OAM, unsigned short DMA, size_t length) {
+	unsigned int i;
+	for(i = 0; i < length; i++) 
+        writeByte(OAM + i, readByte(DMA + i));
+}
+
 unsigned char readByte(unsigned short address) {
 
     unsigned char mask = 0;
@@ -23,7 +29,7 @@ unsigned char readByte(unsigned short address) {
         return wram[address - 0xC000];
     else if (0xE000 <= address && address <= 0xFDFF) // echo of wram
         return wram[address - 0xE000];
-    else if (0xFE00 <= address && address <= 0xFEFF)
+    else if (0xFE00 <= address && address <= 0xFEFF) 
         return oam[address - 0xFE00];
     else if (address == 0xFF00) {
         if (!joypadButtons) 
@@ -32,10 +38,6 @@ unsigned char readByte(unsigned short address) {
             mask = getDirection();
         return (0xC0 | (0xF ^ mask) | ((joypadButtons) | (joypadDirections)));
     }
-    else if (address == 0xFF0F)
-        return interrupt.flags & 0x1F;
-    else if (address == 0xFFFF)
-        return interrupt.enable & 0x1F;
     else if (address == 0xFF04)
         return getDiv();
     else if (address == 0xFF05)
@@ -44,6 +46,8 @@ unsigned char readByte(unsigned short address) {
         return getTma();
     else if (address == 0xFF04)
         return getTac();
+    else if (address == 0xFF0F)
+        return interrupt.flags;
     else if (address == 0xFF40)
         return getLCDC();
     else if (address == 0xFF41)
@@ -58,6 +62,8 @@ unsigned char readByte(unsigned short address) {
     	return io[address - 0xFF00];
     else if (0xFF80 <= address && address <= 0xFFFE) 
         return hram[address - 0xFF80];
+    else if (address == 0xFFFF)
+        return interrupt.enable;
 
     return 0;
 }
@@ -68,14 +74,6 @@ unsigned short readShort(unsigned short address) {
 
 void writeByte(unsigned short address, unsigned char value) {
 
-    // if(address == 0xFFFF) {
-    //     printf("enable: %02x\n", value);
-    // }
-
-    // if(address == 0xFF0F) {
-    //     printf("value: %02x\n", value);
-    // }
-
     // cant write to ROM
     if (0x8000 <= address && address <= 0x9FFF)
         vram[address - 0x8000] = value;
@@ -84,44 +82,38 @@ void writeByte(unsigned short address, unsigned char value) {
     else if (0xC000 <= address && address <= 0xDFFF)
         wram[address - 0xC000] = value;
     else if (0xE000 <= address && address <= 0xFDFF)
-        vram[address - 0xE000] = value;
-    else if (0xFE00 <= address && address <= 0xFEFF)
-        oam[address - 0xFE00] = value;
-    else if (0xFF80 <= address && address <= 0xFFFE) 
-        hram[address - 0xFF80] = value;
-    else if (address == 0xFF0F) {
-        interrupt.flags = value & 0x1F;
-    }
-    else if (address == 0xFFFF) {
-        interrupt.enable = value & 0x1F;
-    }
-    else if (address == 0xFF04)
+        wram[address - 0xE000] = value;
+    else if (0xFE00 <= address && address <= 0xFEFF)  
+        oam[address - 0xFE00] = value; 
+    else if (address == 0xFF04) 
         setDiv(value);
-    else if (address == 0xFF05)
+    else if (address == 0xFF05) 
         setTima(value);
-    else if (address == 0xFF06)
+    else if (address == 0xFF06) 
         setTma(value);
-    else if (address == 0xFF04)
+    else if (address == 0xFF04) 
         setTac(value);
     else if (address == 0xFF40) 
         setLCDC(value);
-    else if (address == 0xFF41)
+    else if (address == 0xFF41) 
         setLCDS(value);
-    else if (address == 0xFF42)
+    else if (address == 0xFF42) 
         setScrollY(value);
-    else if (address == 0xFF43)
+    else if (address == 0xFF43) 
         setScrollX(value);
-    else if (address == 0xFF45)
+    else if (address == 0xFF45) 
         setLyCompare(value);
-    else if (address == 0xFF47)
+    else if(address == 0xff46) 
+        copyToOAM(0xfe00, value << 8, 160); // OAM DMA
+    else if (address == 0xFF47) 
         setBGPalette(value);
-    else if (address == 0xFF48)
+    else if (address == 0xFF48) 
         setSpritePalette1(value);
-    else if (address == 0xFF49)
+    else if (address == 0xFF49) 
         setSpritePalette2(value);
-    else if (address == 0xFF4A)
+    else if (address == 0xFF4A) 
         setWindowY(value);
-    else if (address == 0xFF4B)
+    else if (address == 0xFF4B) 
         setWindowX(value);
     else if (address == 0xFF00) {
         joypadDirections = value & 0x10;
@@ -129,6 +121,12 @@ void writeByte(unsigned short address, unsigned char value) {
     }
     else if(0xFF00 <= address && address <= 0xFF7F) 
     	io[address - 0xFF00] = value;
+    else if (0xFF80 <= address && address <= 0xFFFE) 
+        hram[address - 0xFF80] = value;
+    else if (address == 0xFF0F) 
+        interrupt.flags = value;
+    else if (address == 0xFFFF) 
+        interrupt.enable = value;
     
 }
 

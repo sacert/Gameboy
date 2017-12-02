@@ -9,7 +9,7 @@ SDL_Surface *screen;
 
 void sdlInit(void) {
     SDL_Init(SDL_INIT_VIDEO);
-    display.screen = SDL_CreateWindow("Game Boy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 160, 144, SDL_WINDOW_SHOWN); 
+    display.screen = SDL_CreateWindow("Game Boy Emulator", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 160, 144, SDL_WINDOW_OPENGL); 
     screen = SDL_GetWindowSurface(display.screen);
     frames = 0;
 }
@@ -24,21 +24,17 @@ void sdlSetFrame(void) {
         gettimeofday(&t2, NULL);
         printf("FPS: %i\n", frames/((int)t2.tv_sec - (int)t1.tv_sec));
     }
-
-    /* may need the following */
-    // display.surface = get it up
-    //  display.texture = SDL_CreateTextureFromSurface(display.renderer, display.surface);
-    //  SDL_FreeSurface(display.surface);
-    // SDL_RenderClear(display.renderer);
-    //  SDL_RenderCopy(display.renderer, display.texture, NULL, NULL);
-    //  SDL_RenderPresent(display.renderer); // push 'behind the scenes' into display
     SDL_UpdateWindowSurface(display.screen);
 }
 
-void sdlUpdate(void) {
+int sdlUpdate(void) {
     SDL_Event event;
     
     while (SDL_PollEvent(&event)) {
+
+        if(event.type == SDL_QUIT)
+			return 1;
+        
         switch (event.type) {
             case SDL_KEYDOWN:
                 switch(event.key.keysym.sym) {
@@ -104,15 +100,11 @@ void sdlUpdate(void) {
                 break;
         }
     }
-    //SDL_PushEvent(&event);
+    return 0;
 }
 
 unsigned int *sdlFrameBuffer(void) {
     return screen->pixels;
-}
-
-void sdlQuit(void) {
-    SDL_Quit();
 }
 
 unsigned int getButton(void) {

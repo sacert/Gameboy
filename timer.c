@@ -7,7 +7,8 @@ unsigned int time = 0;
 unsigned int change = 0;
 
 void setDiv(unsigned char address) {
-    timer.div = 0; // setting div to anything makes it 0
+    address = 0;
+    timer.div = address; // setting div to anything makes it 0
 }
 
 unsigned int getDiv(void) {
@@ -31,7 +32,7 @@ unsigned int getTma(void) {
 }
 
 void setTac(unsigned char address) { // revisit this
-    int speeds[] = {64, 1, 4, 16};
+    int speeds[] = {1, 64, 16, 4};
     timer.tac = address;
     timer.started = address & 4;
     timer.speed = speeds[address & 3];
@@ -68,7 +69,7 @@ void timerCycle(void) {
     unsigned int delta = getCycles() - time;
     time = getCycles();
 
-    change += time * 4;
+    change += delta * 4;
 
     if (change >= 16) {
         tick();
