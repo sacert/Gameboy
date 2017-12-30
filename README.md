@@ -14,7 +14,7 @@ SDL2
 $ git clone https://github.com/sacert/Gameboy.git
 $ cd Gameboy
 $ make
-$ ./gameboy [gameboy rom file] // example ./gameboy Tetris.gb
+$ ./gameboy [rom file]
 ```
 
 ## What isn't implemented
