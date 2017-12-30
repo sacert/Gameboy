@@ -9,6 +9,14 @@ A Gameboy emulator created to better understand computer architecture, design, a
 ## Dependencies
 SDL2
 
+# Getting Start
+``` sh
+$ git clone https://github.com/sacert/Gameboy.git
+$ cd Gameboy
+$ make
+$ ./gameboy [gameboy rom file] // example ./gameboy Tetris.gb
+```
+
 ## What isn't implemented
 - Sound
 - Memory mapping (switching between internal ram)
